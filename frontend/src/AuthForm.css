@@ -1,0 +1,126 @@
+/* Reset some defaults */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* Make the body fill the screen and use a linear gradient background */
+html, body {
+  height: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+/* We use flex to vertically stack header + content */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* header at the top, form in the center area */
+}
+
+/* Style the header */
+header {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #fff;
+  font-size: 2rem;
+}
+
+/* This container flexes to fill remaining space and centers the form */
+.auth-container {
+  flex: 1; /* occupies leftover vertical space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* White card for the login or signup box */
+.login-box,
+.signup-box {
+  background: #fff;
+  width: 400px;
+  max-width: 90%;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Heading inside the box */
+.login-box h2,
+.signup-box h2 {
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+  color: #333;
+}
+
+/* Inputs, selects, textareas */
+.login-box input,
+.signup-box input,
+.login-box select,
+.signup-box select,
+.login-box textarea,
+.signup-box textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.3s;
+  background: #f9f9f9;
+}
+
+.login-box input:focus,
+.signup-box input:focus,
+.login-box select:focus,
+.signup-box select:focus,
+.login-box textarea:focus,
+.signup-box textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+/* Button styling */
+.auth-button {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #667eea;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.auth-button:hover {
+  background-color: #5a67d8;
+}
+
+.auth-button:active {
+  transform: scale(0.98);
+}
+
+/* Link styling */
+.auth-link {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.auth-link a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,31 @@
+# Node.js and npm files
+node_modules/
+package-lock.json
+
+# Vite files
+dist/
+.build/
+
+# ESLint cache
+.eslintcache
+
+# React and JavaScript files
+*.js.map
+
+# CSS and Sass files
+*.css.map
+
+# Image and media files
+uploads/
+
+# Miscellaneous files
+.DS_Store
+Thumbs.db
+
+# Frontend-specific files
+frontend/dist/
+frontend/.build/
+
+# Backend-specific files
+backend/uploads/
+backend/node_modules/
