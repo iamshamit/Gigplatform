@@ -1,4 +1,4 @@
-/* Reset some defaults */
+/* Reset some default margins, paddings, and fonts */
 * {
   margin: 0;
   padding: 0;
@@ -6,39 +6,25 @@
   font-family: 'Helvetica Neue', sans-serif;
 }
 
-/* Make the body fill the screen and use a linear gradient background */
-html, body {
-  height: 100%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-}
-
-/* We use flex to vertically stack header + content */
+/* Full-page gradient background */
 body {
+  background: linear-gradient(150deg, #4495ae, #8ea8be);
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* header at the top, form in the center area */
+  color: #333;
 }
 
-/* Style the header */
-header {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  text-align: center;
-  color: #fff;
-  font-size: 2rem;
-}
-
-/* This container flexes to fill remaining space and centers the form */
+/* Container that centers the form vertically & horizontally */
 .auth-container {
-  flex: 1; /* occupies leftover vertical space */
+  flex: 1; /* Takes up remaining space to center the form */
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  height: 85vh;
 }
 
-/* White card for the login or signup box */
+/* White card for login or signup box */
 .login-box,
 .signup-box {
   background: #fff;
@@ -48,9 +34,12 @@ header {
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Heading inside the box */
+/* Headings */
 .login-box h2,
 .signup-box h2 {
   margin-bottom: 1rem;
@@ -73,8 +62,10 @@ header {
   border-radius: 6px;
   transition: border-color 0.3s;
   background: #f9f9f9;
+  color: #333;
 }
 
+/* Focus effect for form elements */
 .login-box input:focus,
 .signup-box input:focus,
 .login-box select:focus,
@@ -85,7 +76,7 @@ header {
   border-color: #667eea;
 }
 
-/* Button styling */
+/* Submit button */
 .auth-button {
   width: 100%;
   padding: 0.8rem 1rem;
@@ -107,7 +98,7 @@ header {
   transform: scale(0.98);
 }
 
-/* Link styling */
+/* Link styling below the form */
 .auth-link {
   margin-top: 1rem;
   font-size: 0.9rem;

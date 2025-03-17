@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../AuthForm.css';
 
 const Signup = () => {
@@ -12,7 +15,7 @@ const Signup = () => {
     bio: '',
     profilePicture: null
   });
-
+  const navigate = useNavigate();
   const handleChange = (e) => {
     if (e.target.name === 'profilePicture') {
       setFormData({ ...formData, profilePicture: e.target.files[0] });
@@ -42,7 +45,8 @@ const Signup = () => {
       await axios.post('http://localhost:5000/auth/signup', data, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      alert('Signup successful! Please log in.');
+      navigate('/login');
+      toast.success('Signup successful! Please log in.');
       setFormData({
         email: '',
         password: '',
@@ -66,8 +70,12 @@ const Signup = () => {
           <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
           <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
           <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
-          <input type="text" name="skills" value={formData.skills} onChange={handleChange} placeholder="Skills (comma separated)" />
-          <textarea name="bio" value={formData.bio} onChange={handleChange} placeholder="Bio"></textarea>
+          {formData.role === 'freelancer' && (
+            <>
+              <input type="text" name="skills" value={formData.skills} onChange={handleChange} placeholder="Skills (comma separated)" />
+              <textarea name="bio" value={formData.bio} onChange={handleChange} placeholder="Bio"></textarea>
+            </>
+          )}
           <input type="file" name="profilePicture" accept="image/*" onChange={handleChange} />
           <select name="role" value={formData.role} onChange={handleChange}>
             <option value="freelancer">Freelancer</option>

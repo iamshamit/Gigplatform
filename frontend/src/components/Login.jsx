@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../AuthForm.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
-      alert('Login successful!');
+      navigate('/dashboard');
+      toast.success('Login successful!');
     } catch (error) {
       console.error('Error logging in:', error);
-      alert('Login failed!');
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 

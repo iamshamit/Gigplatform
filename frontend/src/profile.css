@@ -1,0 +1,76 @@
+/* Basic reset and global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+/* Dashboard container styles */
+.dashboard-container {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 8px;
+  max-width: 500px;
+  margin: 20px auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.dashboard-container h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.75rem;
+}
+
+/* Profile container styles */
+.profile-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-container img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border: 3px solid #6c63ff;
+}
+
+.profile-container p {
+  font-size: 16px;
+  color: #555;
+  margin: 8px 0;
+}
+
+/* Button container and button styles */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.button-container a {
+  text-decoration: none;
+}
+
+.button-container button {
+  background-color: #6c63ff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.button-container button:hover {
+  background-color: #4a43d6;
+}
