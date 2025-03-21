@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import JobList from './components/JobList';
 import JobForm from './components/JobForm';
 import Login from './components/Login';
@@ -10,11 +10,14 @@ import EditProfile from './components/EditProfile';
 import ChangePassword from './components/ChangePassword';
 import Dashboard from './components/Dashboard';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Router>
-      <div>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/jobs" element={<JobList />} />
@@ -22,13 +25,15 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
-      </div>
-    </Router>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
 export default App;
+

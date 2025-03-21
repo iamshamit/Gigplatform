@@ -74,9 +74,9 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, 'your_jwt_secret', { expiresIn: '1h' });
-
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token, message: "Login successful" });
+
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Internal Server Error" });
@@ -130,11 +130,40 @@ router.put('/change-password', authMiddleware, async (req, res) => {
 
 router.get("/getUser/:id", authMiddleware, async (req, res) => {
   try {
-    console.log("Fetching user with ID:", req.params.id);
+    
     const user = await User.findById(req.params.id).select("-password");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/getUser/:id", authMiddleware, async (req, res) => {
+  try {
+    // Verify requester is either the user themselves or an employer
+    if (req.user.role !== "employer" && req.user.id !== req.params.id) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
+    const user = await User.findById(req.params.id)
+      .select("-password -__v -createdAt -updatedAt");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // If requester is employer, hide sensitive fields
+    if (req.user.role === "employer") {
+      const safeUser = user.toObject();
+      delete safeUser.email;
+      delete safeUser.role;
+      return res.json(safeUser);
     }
 
     res.json(user);

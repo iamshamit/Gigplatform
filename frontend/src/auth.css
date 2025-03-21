@@ -1,0 +1,76 @@
+/* Fullscreen Centered Container */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(to bottom, #0F2027, #203A43, #2C5364);
+    margin: 0;
+    padding: 0;
+}
+
+/* Form Box */
+.signup-box {
+    background-color: #1E1E2E;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    width: 400px;
+    max-width: 90%;
+}
+
+/* Heading */
+.signup-box h2 {
+    color: #E0E0E0;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Input Fields */
+.signup-box input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background-color: #252841;
+    color: #E0E0E0;
+    font-size: 16px;
+    transition: 0.3s ease-in-out;
+}
+
+/* Input Focus Effect */
+.signup-box input:focus {
+    outline: none;
+    border-color: #4A90E2;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.8);
+}
+
+/* Submit Button */
+.auth-button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(to right, #6A11CB, #2575FC);
+    color: #fff;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+/* Button Hover Effect */
+.auth-button:hover {
+    background: linear-gradient(to right, #2575FC, #6A11CB);
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .signup-box {
+        width: 90%;
+        padding: 25px;
+    }
+}

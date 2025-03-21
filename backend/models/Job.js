@@ -8,7 +8,11 @@ const jobSchema = new mongoose.Schema({
   employer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }
+  },
+  applicants: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 });
 
 module.exports = mongoose.model('Job', jobSchema); 

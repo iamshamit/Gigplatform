@@ -7,12 +7,24 @@ const FetchEmployer = ({ employerId }) => {
   useEffect(() => {
     const fetchEmployer = async () => {
       try {
-        console.log("Fetching employer with ID:", employerId);
-        const token = localStorage.getItem("token"); // Ensure user is authenticated
+        // Check if the employer data is in localStorage
+        const cachedEmployer = localStorage.getItem(`employer_${employerId}`);
+        if (cachedEmployer) {
+          setEmployer(JSON.parse(cachedEmployer));
+          return;
+        }
+
+        const token = localStorage.getItem("token");
+        // Ensure employerId is a string
+        const id = typeof employerId === "object" ? employerId._id : employerId;
+
         const response = await axios.get(
-          `http://localhost:5000/auth/getUser/${employerId}`,
+          `http://localhost:5000/auth/getUser/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+
+        // Save the fetched data to localStorage
+        localStorage.setItem(`employer_${employerId}`, JSON.stringify(response.data));
         setEmployer(response.data);
       } catch (error) {
         console.error("Error fetching employer:", error);
