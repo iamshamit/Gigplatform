@@ -9,6 +9,7 @@ import Profile from './components/Profile';
 import EditProfile from './components/EditProfile';
 import ChangePassword from './components/ChangePassword';
 import Dashboard from './components/Dashboard';
+import Chat from './components/Chat';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -29,6 +30,7 @@ function App() {
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/chat/:jobId" element={<Chat />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
@@ -36,4 +38,3 @@ function App() {
 }
 
 export default App;
-

@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import FetchEmployer from "./FetchEmployer";
 import "../dashboard.css";
 import axios from "axios";
@@ -9,6 +15,7 @@ import Modal from "react-modal";
 import Select from "react-select";
 import { useQuery, useQueryClient } from "react-query";
 import { FixedSizeList as List } from "react-window";
+import { FaStar } from "react-icons/fa";
 
 const Dashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -40,9 +47,76 @@ const Dashboard = () => {
   const [isGridView, setIsGridView] = useState(
     localStorage.getItem("isGridView") === "true"
   );
-  const [isDarkMode, setIsDarkMode] = useState(
-    localStorage.getItem("isDarkMode") === "true"
-  );
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem("isDarkMode");
+    return savedMode === "true";
+  });
+  const [jobCategories, setJobCategories] = useState([
+    { value: "Web Development", label: "Web Development" },
+    { value: "Mobile App Development", label: "Mobile App Development" },
+    { value: "Graphic Design", label: "Graphic Design" },
+    { value: "Content Writing", label: "Content Writing" },
+    { value: "Digital Marketing", label: "Digital Marketing" },
+    { value: "Video Editing", label: "Video Editing" },
+    { value: "Business Consulting", label: "Business Consulting" },
+    { value: "Software Development", label: "Software Development" },
+    { value: "Photography", label: "Photography" },
+    { value: "Music Production", label: "Music Production" },
+    {
+      value: "Engineering & Architecture",
+      label: "Engineering & Architecture",
+    },
+    { value: "Online Tutoring", label: "Online Tutoring" },
+    { value: "Health & Fitness Coaching", label: "Health & Fitness Coaching" },
+    { value: "Translation Services", label: "Translation Services" },
+    { value: "Virtual Assistance", label: "Virtual Assistance" },
+    { value: "E-commerce Development", label: "E-commerce Development" },
+    { value: "Real Estate Services", label: "Real Estate Services" },
+    { value: "Game Development", label: "Game Development" },
+    { value: "Social Media Management", label: "Social Media Management" },
+    { value: "Data Entry", label: "Data Entry" },
+    { value: "Research Paper Writing", label: "Research Paper Writing" },
+    { value: "Video Production", label: "Video Production" },
+    { value: "Data Science", label: "Data Science" },
+    { value: "Accounting", label: "Accounting" },
+    { value: "Legal Services", label: "Legal Services" },
+    { value: "IT Consulting", label: "IT Consulting" },
+    { value: "Product Management", label: "Product Management" },
+    { value: "UX/UI Design", label: "UX/UI Design" },
+    { value: "AI Development", label: "AI Development" },
+    { value: "Cybersecurity", label: "Cybersecurity" },
+    { value: "Blockchain Development", label: "Blockchain Development" },
+    { value: "AR/VR Development", label: "AR/VR Development" },
+    { value: "VR/AR Development", label: "VR/AR Development" },
+    { value: "Robotics", label: "Robotics" },
+    { value: "IOT Development", label: "IOT Development" },
+    { value: "AI/ML Development", label: "AI/ML Development" },
+    { value: "Cybersecurity", label: "Cybersecurity" },
+  ]);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState({
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+    name: "",
+  });
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [selectedJobForCompletion, setSelectedJobForCompletion] =
+    useState(null);
+  const [completionPercentage, setCompletionPercentage] = useState(10);
+  const [rating, setRating] = useState(5);
+  const [review, setReview] = useState("");
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+  const [selectedPaymentJob, setSelectedPaymentJob] = useState(null);
+  const [isSelectedFreelancer, setIsSelectedFreelancer] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+
+  useEffect(() => {
+    if (selectedJob) {
+      queryClient.invalidateQueries(["applicantDetails", selectedJob]);
+    }
+  }, [selectedJob, queryClient]);
 
   const DeleteConfirmationModal = () => (
     <Modal
@@ -85,7 +159,6 @@ const Dashboard = () => {
   );
 
   const handleDeleteJob = async (jobId) => {
-    
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`http://localhost:5000/jobs/${jobId}`, {
@@ -128,51 +201,7 @@ const Dashboard = () => {
     return response.data;
   };
 
-  const jobCategories = [
-    { value: "Web Development", label: "Web Development" },
-    { value: "Mobile App Development", label: "Mobile App Development" },
-    { value: "Graphic Design", label: "Graphic Design" },
-    { value: "Content Writing", label: "Content Writing" },
-    { value: "Digital Marketing", label: "Digital Marketing" },
-    { value: "Video Editing", label: "Video Editing" },
-    { value: "Business Consulting", label: "Business Consulting" },
-    { value: "Software Development", label: "Software Development" },
-    { value: "Photography", label: "Photography" },
-    { value: "Music Production", label: "Music Production" },
-    {
-      value: "Engineering & Architecture",
-      label: "Engineering & Architecture",
-    },
-    { value: "Online Tutoring", label: "Online Tutoring" },
-    { value: "Health & Fitness Coaching", label: "Health & Fitness Coaching" },
-    { value: "Translation Services", label: "Translation Services" },
-    { value: "Virtual Assistance", label: "Virtual Assistance" },
-    { value: "E-commerce Development", label: "E-commerce Development" },
-    { value: "Real Estate Services", label: "Real Estate Services" },
-    { value: "Game Development", label: "Game Development" },
-    { value: "Social Media Management", label: "Social Media Management" },
-    { value: "Data Entry", label: "Data Entry" },
-    { value: "Research Paper Writing", label: "Research Paper Writing" },
-    { value: "Video Production", label: "Video Production" },
-    { value: "Data Science", label: "Data Science" },
-    { value: "Accounting", label: "Accounting" },
-    { value: "Legal Services", label: "Legal Services" },
-    { value: "IT Consulting", label: "IT Consulting" },
-    { value: "Product Management", label: "Product Management" },
-    { value: "UX/UI Design", label: "UX/UI Design" },
-    { value: "AI Development", label: "AI Development" },
-    { value: "Cybersecurity", label: "Cybersecurity" },
-    { value: "Blockchain Development", label: "Blockchain Development" },
-    { value: "AR/VR Development", label: "AR/VR Development" },
-    { value: "VR/AR Development", label: "VR/AR Development" },
-    { value: "Robotics", label: "Robotics" },
-    { value: "IOT Development", label: "IOT Development" },
-    { value: "AI/ML Development", label: "AI/ML Development" },
-    { value: "Cybersecurity", label: "Cybersecurity" },
-  ];
-
   const handleDelete = async (jobId) => {
-
     try {
       const token = localStorage.getItem("token");
 
@@ -257,35 +286,94 @@ const Dashboard = () => {
     </div>
   );
 
-  const JobRow = ({ job, index, onClick }) => (
+const JobRow = ({ job, index, onClick }) => {
+  const isSelected = job.selectedApplicant === user._id;
+  const hasPayments = job.payments?.length > 0;
+  const showPayment = isSelected && (job.status === "completed" || hasPayments);
+
+  return (
     <div
       key={job.id || index}
       className={`products-row ${onClick ? "clickable" : ""}`}
       onClick={onClick}
+      style={{ marginBottom: "1rem" }}
     >
-      <div className="product-cell title">
+      <div className="product-cell title" style={{ padding: "0.75rem" }}>
         <span className="cell-label">Title:</span>
         {job.title}
       </div>
-      <div className="product-cell description">
+      <div
+        className="product-cell description"
+        style={{ padding: "0.75rem", textAlign: "left" }}
+      >
         <span className="cell-label">Description:</span>
         {job.description}
       </div>
-      <div className="product-cell budget">
+      <div className="product-cell budget" style={{ padding: "0.75rem" }}>
         <span className="cell-label">Budget:</span>₹{job.budget}
       </div>
-      <div className="product-cell category">
+      <div
+        className="product-cell category"
+        style={{ padding: "0.75rem" }}
+      >
         <span className="cell-label">Category:</span>
         {job.category}
       </div>
+      {user.role === "freelancer" && activeTab === "applied-jobs" && (
+        <div className="product-cell payment-status">
+          {showPayment ? (
+            <>
+              <div className="payment-amount">
+                ₹{job.totalPaid?.toFixed(2)} transferred
+              </div>
+              {hasPayments && (
+                <button
+                  className="payment-details-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPaymentJob(job);
+                    setShowPaymentDetails(true);
+                  }}
+                >
+                  View Details
+                </button>
+              )}
+            </>
+          ) : (
+            <span className="payment-pending">
+              {isSelected ? "Payment pending" : "Not selected"}
+            </span>
+          )}
+        </div>
+      )}
       {user.role === "freelancer" && activeTab !== "applied-jobs" && (
-        <div className="product-cell employer">
+        <div
+          className="product-cell employer"
+          style={{ padding: "0.75rem" }}
+        >
           <span className="cell-label">Employer:</span>
           {job.employer && <FetchEmployer employerId={job.employer} />}
         </div>
       )}
       {(user.role === "employer" || activeTab === "applied-jobs") && (
-        <div className="product-cell actions">
+        <div
+          className="product-cell actions"
+          style={{ padding: "0.75rem" }}
+        >
+          {activeTab === "applied-jobs" &&
+            job.selectedApplicant === user._id && (
+              <>
+                <button
+                  className="chat-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/chat/${job._id}`);
+                  }}
+                >
+                  Chat
+                </button>
+              </>
+            )}
           <button
             className="delete-button"
             onClick={(e) => {
@@ -302,6 +390,7 @@ const Dashboard = () => {
       )}
     </div>
   );
+};
 
   const customStyles = {
     content: {
@@ -314,16 +403,16 @@ const Dashboard = () => {
       width: "400px",
       padding: "20px",
       borderRadius: "10px",
-      backgroundColor: isDarkMode ? "#f1f1f1" : "#1e293b", // Dark when darkmode else light when light mode
-      color: isDarkMode ? "#000000" : "#ffffff", // Dark mode text color
+      backgroundColor: isDarkMode ? "#2d2d2d" : "#ffffff",
+      color: isDarkMode ? "#ffffff" : "#000000",
       border: "none",
       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     },
     overlay: {
       backgroundColor: isDarkMode
         ? "rgba(0, 0, 0, 0.75)"
-        : "rgba(0, 0, 0, 0.5)", // Dark mode overlay
-      backdropFilter: "blur(5px)", // Blurred background
+        : "rgba(0, 0, 0, 0.5)",
+      backdropFilter: "blur(5px)",
     },
   };
 
@@ -364,11 +453,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     localStorage.setItem("isDarkMode", isDarkMode);
-    if (isDarkMode) {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
+    document.documentElement.classList.toggle("dark-mode", isDarkMode);
   }, [isDarkMode]);
 
   const toggleFilterMenu = () => {
@@ -384,7 +469,10 @@ const Dashboard = () => {
   };
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem("isDarkMode", newMode);
+    document.documentElement.classList.toggle("dark-mode", newMode);
   };
 
   const filteredJobs = jobs.filter((job) => {
@@ -395,13 +483,41 @@ const Dashboard = () => {
       ? job.category === selectedCategory
       : true;
 
+    // Exclude completed jobs
+    const isNotCompleted = job.status !== "completed";
+
+    // Hide jobs with selected applicants from other freelancers
+    const isVisibleToFreelancer =
+      user.role === "freelancer"
+        ? !job.selectedApplicant || job.selectedApplicant === user._id
+        : true;
+
     if (activeTab === "applied-jobs" && user.role === "freelancer") {
-      return (
-        matchesSearch && matchesCategory && job.applicants?.includes(user._id)
-      );
+      const isApplied =
+        matchesSearch &&
+        matchesCategory &&
+        job.applicants?.includes(user._id) &&
+        isNotCompleted &&
+        isVisibleToFreelancer;
+      console.log("Job filtering for applied jobs:", {
+        jobId: job._id,
+        title: job.title,
+        matchesSearch,
+        matchesCategory,
+        isNotCompleted,
+        isVisibleToFreelancer,
+        isApplied,
+        applicants: job.applicants,
+      });
+      return isApplied;
     }
 
-    return matchesSearch && matchesCategory;
+    return (
+      matchesSearch &&
+      matchesCategory &&
+      isNotCompleted &&
+      isVisibleToFreelancer
+    );
   });
 
   const handleApplyFilters = () => {
@@ -415,7 +531,7 @@ const Dashboard = () => {
     setIsFilterActive(false); // Close filter menu
   };
 
-  const handleJobClick = async (jobId) => {
+  const fetchJobDetails = useCallback(async (jobId) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(`http://localhost:5000/jobs/${jobId}`, {
@@ -426,52 +542,50 @@ const Dashboard = () => {
       console.error("Error fetching job details:", error);
       toast.error("Failed to fetch job details");
     }
-  };
+  }, []);
 
-  const handleApply = async () => {
+  const handleJobClick = useCallback(
+    (jobId) => {
+      setSelectedJob(null); // Clear previous job immediately
+      fetchJobDetails(jobId);
+    },
+    [fetchJobDetails]
+  );
+
+  const handleApply = useCallback(async () => {
+    if (!selectedJob) return;
+
     try {
       const token = localStorage.getItem("token");
+      // Optimistic update
+      const updatedJob = {
+        ...selectedJob,
+        applicants: [...(selectedJob.applicants || []), user._id],
+      };
+      setSelectedJob(updatedJob);
+
+      // Update jobs list optimistically
+      setJobs((prevJobs) =>
+        prevJobs.map((job) => (job._id === selectedJob._id ? updatedJob : job))
+      );
+
       await axios.post(
         `http://localhost:5000/jobs/${selectedJob._id}/apply`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Update both selectedJob and main jobs list
-      const updatedJobs = jobs.map((job) => {
-        if (job._id === selectedJob._id) {
-          return {
-            ...job,
-            applicants: [...(job.applicants || []), user._id],
-          };
-        }
-        return job;
-      });
-
-      setJobs(updatedJobs);
-      setSelectedJob((prev) => ({
-        ...prev,
-        applicants: [...(prev.applicants || []), user._id],
-      }));
-
-      toast.success("Applied successfully!", {
-        /*...*/
-      });
+      toast.success("Applied successfully!");
     } catch (error) {
       console.error("Error applying for job:", error);
-
-      // Show error toast
-      toast.error("Failed to apply for job. Please try again.", {
-        position: "top-right",
-        autoClose: 3000, // Close the toast after 3 seconds
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      // Revert optimistic update on error
+      setSelectedJob(selectedJob);
+      setJobs((prevJobs) =>
+        prevJobs.map((job) => (job._id === selectedJob._id ? selectedJob : job))
+      );
+      toast.error("Failed to apply for job. Please try again.");
     }
-  };
+  }, [selectedJob, user._id]);
 
   const { data: currentUser } = useQuery(
     "currentUser",
@@ -493,17 +607,19 @@ const Dashboard = () => {
     ["jobs", activeTab, currentUser?._id],
     async () => {
       const token = localStorage.getItem("token");
-      
+
       let endpoint = "http://localhost:5000/jobs/";
       if (currentUser?.role === "employer") {
         endpoint = `http://localhost:5000/jobs/employer/${currentUser._id}`;
       } else if (activeTab === "applied-jobs") {
         endpoint = `http://localhost:5000/jobs/applied/${currentUser._id}`;
       }
-  
+
+      console.log("Fetching jobs from endpoint:", endpoint);
       const response = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log("Received jobs data:", response.data);
       return response.data;
     },
     {
@@ -520,24 +636,48 @@ const Dashboard = () => {
   }, [activeTab, currentUser?._id, queryClient]);
 
   useEffect(() => {
-    if (currentUser) setUser(currentUser);
-    if (jobsData) setJobs(jobsData);
+    if (currentUser) {
+      console.log("Current user:", currentUser);
+      setUser(currentUser);
+    }
+    if (jobsData) {
+      console.log("Setting jobs data:", jobsData);
+      setJobs(jobsData);
+    }
   }, [currentUser, jobsData]);
 
   useEffect(() => {
     setLoading(jobsLoading || !currentUser);
   }, [jobsLoading, currentUser]);
 
+  // Add new useEffect to handle tab changes
+  useEffect(() => {
+    if (activeTab === "applied-jobs" && currentUser?._id) {
+      queryClient.invalidateQueries(["jobs", "applied-jobs", currentUser._id]);
+    }
+  }, [activeTab, currentUser?._id, queryClient]);
+
   const handleAddJob = async (e) => {
     e.preventDefault();
+    setShowPaymentModal(true);
+  };
 
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+
+    // Simulate payment processing
     try {
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Simulate successful payment
       const token = localStorage.getItem("token");
       const response = await axios.post(
         "http://localhost:5000/jobs/",
         {
           ...jobForm,
-          employer: user._id, // Add the employer ID from the user object
+          employer: user._id,
+          paymentStatus: "completed",
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -547,7 +687,8 @@ const Dashboard = () => {
       // Update the jobs list with the new job
       setJobs([...jobs, response.data]);
 
-      // Close the modal and reset the form
+      // Close the modals and reset the form
+      setShowPaymentModal(false);
       setShowAddJobModal(false);
       setJobForm({
         title: "",
@@ -555,11 +696,12 @@ const Dashboard = () => {
         budget: "",
         category: "",
       });
+
+      toast.success("Payment successful and job created!");
       queryClient.invalidateQueries("jobs");
-      window.location.reload();
     } catch (error) {
-      console.error("Error adding job:", error);
-      toast.error("Failed to add job. Please try again.");
+      console.error("Error processing payment:", error);
+      toast.error("Payment failed. Please try again.");
     }
   };
 
@@ -586,7 +728,7 @@ const Dashboard = () => {
     });
   };
 
-  const ApplicantsView = React.memo(({ isDarkMode }) => {
+  const ApplicantsView = ({ isDarkMode }) => {
     const [selectedJob, setSelectedJob] = useState(null);
     const { data: applications = [], refetch } = useQuery(
       "applicants",
@@ -594,9 +736,10 @@ const Dashboard = () => {
       {
         enabled: activeTab === "applicants",
         staleTime: 0,
+        select: (data) => data.filter((job) => job.status !== "completed"),
       }
     );
-    
+
     useEffect(() => {
       if (activeTab === "applicants") {
         refetch();
@@ -606,8 +749,42 @@ const Dashboard = () => {
     const { data: detailedApplicants = [] } = useQuery(
       ["applicantDetails", selectedJob],
       () => fetchApplicantDetails(selectedJob),
-      { enabled: !!selectedJob }
+      {
+        enabled: !!selectedJob,
+        staleTime: 0,
+        cacheTime: 0,
+      }
     );
+
+    const handleSelectApplicant = async (jobId, applicantId) => {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.post(
+          `http://localhost:5000/jobs/${jobId}/select-applicant`,
+          { applicantId },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // Optimistic update of the applicants data
+        queryClient.setQueryData("applicants", (old) => {
+          return old.map((job) => ({
+            ...job,
+            selectedApplicant:
+              job._id === jobId ? applicantId : job.selectedApplicant,
+          }));
+        });
+
+        toast.success("Applicant selected successfully!");
+        // Invalidate both the applicantDetails and selectedApplicant queries so that the UI updates
+        queryClient.invalidateQueries(["applicantDetails", jobId]);
+        queryClient.invalidateQueries(["selectedApplicant", jobId]);
+      } catch (error) {
+        console.error("Error selecting applicant:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to select applicant"
+        );
+      }
+    };
 
     return (
       <div className={`applicants-container ${isDarkMode ? "dark-mode" : ""}`}>
@@ -615,85 +792,503 @@ const Dashboard = () => {
         {applications.length === 0 ? (
           <div className="no-applicants">No applications received yet</div>
         ) : (
-          applications.map((job) => (
-            <div
-              key={job._id}
-              className={`job-applicants-card ${isDarkMode ? "dark-mode" : ""}`}
-            >
+          applications
+            .filter((job) => job.status !== "completed")
+            .map((job) => (
               <div
-                className="job-header"
-                onClick={() =>
-                  setSelectedJob((prev) => (prev === job._id ? null : job._id))
-                }
+                key={job._id}
+                className={`job-applicants-card ${
+                  isDarkMode ? "dark-mode" : ""
+                }`}
               >
-                <h3>{job.title}</h3>
-                <div className="applicant-count">
-                  <span>{job.applicants.length}</span>
-                  {job.applicants.length === 1 ? " applicant" : " applicants"}
-                </div>
-              </div>
-
-              {selectedJob === job._id && (
-                <List
-                  height={400}
-                  itemCount={detailedApplicants.length}
-                  itemSize={110} // Card height + spacing
-                  width="100%"
-                  className="applicants-list"
+                <div
+                  className="job-header"
+                  onClick={() =>
+                    setSelectedJob((prev) =>
+                      prev === job._id ? null : job._id
+                    )
+                  }
                 >
-                  {({ index, style }) => (
-                    <div
-                      style={{
-                        ...style,
-                        height: "94px", // 94px card + 16px spacing
-                        padding: "0 15px 16px 15px",
-                        boxSizing: "border-box",
-                      }}
-                    >
+                  <h3>{job.title}</h3>
+                  <div className="applicant-count">
+                    <span>{job.applicants.length}</span>
+                    {job.applicants.length === 1 ? " applicant" : " applicants"}
+                  </div>
+                </div>
+
+                {selectedJob === job._id && (
+                  <List
+                    height={400}
+                    itemCount={detailedApplicants.length}
+                    itemSize={110}
+                    width="100%"
+                    className="applicants-list"
+                  >
+                    {({ index, style }) => (
                       <div
-                        className={`applicant-card ${
-                          isDarkMode ? "dark-mode" : ""
-                        }`}
+                        style={{
+                          ...style,
+                          height: "94px",
+                          padding: "0 15px 16px 15px",
+                          boxSizing: "border-box",
+                        }}
                       >
-                        <div className="applicant-info">
-                          <img
-                            src={`http://localhost:5000/uploads/${
-                              detailedApplicants[index].profilePicture ||
-                              "default.png"
-                            }`}
-                            alt="Applicant"
-                            className="applicant-avatar"
-                          />
-                          <div className="applicant-details">
-                            <h4>{detailedApplicants[index].name}</h4>
-                            <div className="applicant-skills">
-                              {detailedApplicants[index].skills
-                                ?.slice(0, 3)
-                                .join(" • ")}
+                        <div
+                          className={`applicant-card ${
+                            isDarkMode ? "dark-mode" : ""
+                          }`}
+                        >
+                          <div className="applicant-info">
+                            <img
+                              src={`http://localhost:5000/uploads/${
+                                detailedApplicants[index].profilePicture ||
+                                "default.png"
+                              }`}
+                              alt="Applicant"
+                              className="applicant-avatar"
+                            />
+                            <div className="applicant-details">
+                              <h4>{detailedApplicants[index].name}</h4>
+                              <div className="applicant-skills">
+                                {detailedApplicants[index].skills
+                                  ?.slice(0, 3)
+                                  .join(" • ")}
+                              </div>
                             </div>
                           </div>
+                          <div className="applicant-actions">
+                            <button
+                              className="view-profile-btn"
+                              onClick={() =>
+                                navigate(
+                                  `/profile/${detailedApplicants[index]._id}`
+                                )
+                              }
+                            >
+                              View Profile →
+                            </button>
+                            {(() => {
+                              // Fetch the selected applicant for this job using the GET route
+                              const { data: selectedApplicant, isLoading } =
+                                useQuery(
+                                  ["selectedApplicant", job._id],
+                                  async () => {
+                                    const token = localStorage.getItem("token");
+                                    const { data } = await axios.get(
+                                      `http://localhost:5000/jobs/${job._id}/selected-applicant`,
+                                      {
+                                        headers: {
+                                          Authorization: `Bearer ${token}`,
+                                        },
+                                      }
+                                    );
+                                    return data.selectedApplicant;
+                                  },
+                                  { enabled: !!job._id, retry: false }
+                                );
+
+                              const isCurrentSelected =
+                                !isLoading &&
+                                selectedApplicant &&
+                                selectedApplicant._id.toString() ===
+                                  detailedApplicants[index]?._id.toString();
+
+                              return isCurrentSelected ? (
+                                <>
+                                  <button className="selected-btn" disabled>
+                                    Selected ✓
+                                  </button>
+                                  <button
+                                    className="chat-btn"
+                                    onClick={() => navigate(`/chat/${job._id}`)}
+                                  >
+                                    Chat
+                                  </button>
+
+                                  <button
+                                    className="complete-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCompleteJob(job._id);
+                                    }}
+                                  >
+                                    Complete
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  className="select-btn"
+                                  onClick={() =>
+                                    handleSelectApplicant(
+                                      job._id,
+                                      detailedApplicants[index]?._id
+                                    )
+                                  }
+                                >
+                                  Select
+                                </button>
+                              );
+                            })()}
+                          </div>
                         </div>
-                        <button
-                          className="view-profile-btn"
-                          onClick={() =>
-                            navigate(
-                              `/profile/${detailedApplicants[index]._id}`
-                            )
-                          }
-                        >
-                          View Profile →
-                        </button>
                       </div>
-                    </div>
-                  )}
-                </List>
-              )}
-            </div>
-          ))
+                    )}
+                  </List>
+                )}
+              </div>
+            ))
         )}
       </div>
     );
-  });
+  };
+
+  const handleCompleteJob = async (jobId) => {
+    setSelectedJobForCompletion(jobId);
+    const job = jobs.find((j) => j._id === jobId);
+    setCompletionPercentage(job.completionPercentage || 0);
+    setShowCompletionModal(true);
+  };
+
+  const handleCompletionSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.patch(
+        `http://localhost:5000/jobs/${selectedJobForCompletion}/complete`,
+        { completionPercentage },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Update local state
+      const updatedJobs = jobs.map((job) => {
+        if (job._id === selectedJobForCompletion) {
+          return { ...job, completionPercentage };
+        }
+        return job;
+      });
+      setJobs(updatedJobs);
+
+      // Show payment confirmation
+      const job = jobs.find((j) => j._id === selectedJobForCompletion);
+      const paymentAmount = (job.budget * completionPercentage) / 100;
+      toast.success(
+        `Payment of ₹${paymentAmount} has been released to the freelancer!`
+      );
+
+      // If 100% completion, show rating modal
+      if (completionPercentage === 100) {
+        setShowCompletionModal(false);
+        setShowRatingModal(true);
+      } else {
+        setShowCompletionModal(false);
+      }
+    } catch (error) {
+      console.error("Error updating completion:", error);
+      toast.error("Failed to update job completion");
+    }
+  };
+
+  const CompletedJobsView = () => {
+    const completedJobs = jobs.filter(
+      (job) =>
+        job.status === "completed" &&
+        job.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (selectedCategory ? job.category === selectedCategory : true)
+    );
+
+    const sortedCompletedJobs = completedJobs.sort((a, b) => {
+      if (sortOrder === "asc") return a.budget - b.budget;
+      return b.budget - a.budget;
+    });
+
+    const CompletedJobRow = ({ job, index }) => (
+      <div key={job._id || index} className="products-row">
+        <div className="product-cell title">{job.title}</div>
+        <div className="product-cell description">{job.description}</div>
+        <div className="product-cell budget">₹{job.budget}</div>
+        <div className="product-cell category">{job.category}</div>
+        <div className="product-cell actions">
+          <button
+            className="chat-btn"
+            onClick={() => navigate(`/chat/${job._id}`)}
+          >
+            Chat
+          </button>
+        </div>
+      </div>
+    );
+
+    return (
+      <>
+        <div className="app-content-header">
+          <h1 className="app-content-headerText">Completed Jobs</h1>
+          <button
+            className={`mode-switch ${isDarkMode ? "active" : ""}`}
+            onClick={toggleDarkMode}
+          >
+            <svg
+              className="moon"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              width={24}
+              height={24}
+              viewBox="0 0 24 24"
+            >
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+            </svg>
+          </button>
+        </div>
+        <div className="app-content-actions">
+          <input
+            className="search-bar"
+            placeholder="Search..."
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <div className="app-content-actions-wrapper">
+            <div className="filter-button-wrapper">
+              <button
+                className="action-button filter jsFilter"
+                onClick={toggleFilterMenu}
+              >
+                <span>Filter</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={16}
+                  height={16}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="feather feather-filter"
+                >
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+              </button>
+              <div className={`filter-menu ${isFilterActive ? "active" : ""}`}>
+                <label>Category</label>
+                <select
+                  value={tempCategory}
+                  onChange={(e) => setTempCategory(e.target.value)}
+                >
+                  <option value="">All Categories</option>
+                  {jobCategories.map((category, index) => (
+                    <option key={`${category}-${index}`} value={category.value}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="filter-menu-buttons">
+                  <button
+                    className="filter-button reset"
+                    onClick={handleResetFilters}
+                  >
+                    Reset
+                  </button>
+                  <button
+                    className="filter-button apply"
+                    onClick={handleApplyFilters}
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <button
+              className={`action-button list ${!isGridView ? "active" : ""}`}
+              onClick={switchToListView}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={16}
+                height={16}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="feather feather-list"
+              >
+                <line x1={8} y1={6} x2={21} y2={6} />
+                <line x1={8} y1={12} x2={21} y2={12} />
+                <line x1={8} y1={18} x2={21} y2={18} />
+                <line x1={3} y1={6} x2="3.01" y2={6} />
+                <line x1={3} y1={12} x2="3.01" y2={12} />
+                <line x1={3} y1={18} x2="3.01" y2={18} />
+              </svg>
+            </button>
+            <button
+              className={`action-button grid ${isGridView ? "active" : ""}`}
+              onClick={switchToGridView}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={16}
+                height={16}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="feather feather-grid"
+              >
+                <rect x={3} y={3} width={7} height={7} />
+                <rect x={14} y={3} width={7} height={7} />
+                <rect x={14} y={14} width={7} height={7} />
+                <rect x={3} y={14} width={7} height={7} />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div
+          className={`products-area-wrapper ${
+            isGridView ? "gridView" : "tableView"
+          }`}
+        >
+          <div className="products-header">
+            <div className="product-cell title">Title</div>
+            <div className="product-cell description">Description</div>
+            <div className="product-cell budget">
+              Budget
+              <button
+                className="sort-button"
+                onClick={() =>
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                }
+              >
+                {sortOrder === "asc" ? "↑" : "↓"}
+              </button>
+            </div>
+            <div className="product-cell category">Category</div>
+            <div className="product-cell actions">Actions</div>
+          </div>
+          {loading ? (
+            <div className="loading">Loading...</div>
+          ) : sortedCompletedJobs.length > 0 ? (
+            sortedCompletedJobs.map((job, index) => (
+              <CompletedJobRow key={job._id} job={job} index={index} />
+            ))
+          ) : (
+            <div className="no-jobs">
+              {searchQuery ? "No matching jobs found" : "No completed jobs yet"}
+            </div>
+          )}
+        </div>
+      </>
+    );
+  };
+
+  const handleRatingSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `http://localhost:5000/jobs/${selectedJobForCompletion}/rate`,
+        { rating, review },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success("Rating submitted successfully!");
+      setShowRatingModal(false);
+      setRating(5);
+      setReview("");
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+      toast.error("Failed to submit rating");
+    }
+  };
+
+  const CompletionModal = () => {
+    const job = jobs.find((j) => j._id === selectedJobForCompletion);
+    const currentProgress = job?.completionPercentage || 0;
+    const availablePercentages = [
+      10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
+    ].filter((percent) => percent >= currentProgress);
+
+    return (
+      <Modal
+        isOpen={showCompletionModal}
+        onRequestClose={() => setShowCompletionModal(false)}
+        style={customStyles}
+        contentLabel="Completion Modal"
+      >
+        <h2
+          className={`text-xl font-bold mb-4 ${
+            isDarkMode ? "text-white" : "text-black"
+          }`}
+        >
+          Mark Job as Complete
+        </h2>
+        <form onSubmit={handleCompletionSubmit}>
+          <div className="mb-4">
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Completion Percentage
+            </label>
+            <select
+              value={completionPercentage}
+              onChange={(e) => setCompletionPercentage(Number(e.target.value))}
+              className={`w-full p-2 border rounded ${
+                isDarkMode
+                  ? "bg-gray-700 border-gray-600 text-white"
+                  : "bg-white border-gray-300 text-black"
+              }`}
+            >
+              {availablePercentages.map((percent) => (
+                <option key={percent} value={percent}>
+                  {percent}%
+                </option>
+              ))}
+            </select>
+            {currentProgress > 0 && (
+              <p
+                className={`mt-2 text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Current progress: {currentProgress}%
+              </p>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setShowCompletionModal(false)}
+              className={`mr-4 px-4 py-2 rounded ${
+                isDarkMode
+                  ? "bg-gray-600 text-white hover:bg-gray-700"
+                  : "bg-gray-300 text-black hover:bg-gray-400"
+              }`}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={`px-4 py-2 rounded ${
+                isDarkMode
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      </Modal>
+    );
+  };
 
   return (
     <>
@@ -810,6 +1405,38 @@ const Dashboard = () => {
                 </a>
               </li>
             )}
+            {user.role === "employer" && (
+              <li
+                className={`sidebar-list-item ${
+                  activeTab === "completed-jobs" ? "active" : ""
+                }`}
+              >
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab("completed-jobs");
+                    setSelectedJob(null);
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={18}
+                    height={18}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 11.07V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="23 3 12 14 9 11" />
+                  </svg>
+                  <span>Completed Jobs</span>
+                </a>
+              </li>
+            )}
           </ul>
           <div className="account-info">
             <div className="account-info-picture">
@@ -876,6 +1503,8 @@ const Dashboard = () => {
             <JobDetailsView />
           ) : activeTab === "applicants" ? (
             <ApplicantsView isDarkMode={isDarkMode} />
+          ) : activeTab === "completed-jobs" ? (
+            <CompletedJobsView />
           ) : (
             <>
               <div className="app-content-header">
@@ -1051,13 +1680,18 @@ const Dashboard = () => {
                       }}
                     >
                       {sortOrder === "asc" ? "↑" : "↓"}{" "}
-                      {/* Arrow to indicate sorting order */}
                     </button>
                   </div>
                   <div className="product-cell category">Category</div>
                   {user.role === "freelancer" &&
                     activeTab !== "applied-jobs" && (
                       <div className="product-cell">Employer</div>
+                    )}
+                  {user.role === "freelancer" &&
+                    activeTab === "applied-jobs" && (
+                      <div className="product-cell payment-status">
+                        Payment Status
+                      </div>
                     )}
                   {(user.role === "employer" ||
                     activeTab === "applied-jobs") && (
@@ -1073,7 +1707,8 @@ const Dashboard = () => {
                       job={job}
                       index={index}
                       onClick={
-                        user.role === "freelancer" && activeTab !== "applied-jobs"
+                        user.role === "freelancer" &&
+                        activeTab !== "applied-jobs"
                           ? () => handleJobClick(job._id)
                           : undefined
                       }
@@ -1164,7 +1799,273 @@ const Dashboard = () => {
           </div>
         </form>
       </Modal>
+      <Modal
+        isOpen={showPaymentModal}
+        onRequestClose={() => setShowPaymentModal(false)}
+        style={customStyles}
+        contentLabel="Payment Modal"
+      >
+        <h2
+          className={`text-xl font-bold mb-4 ${
+            isDarkMode ? "text-white" : "text-black"
+          }`}
+        >
+          Payment Details
+        </h2>
+        <form onSubmit={handlePaymentSubmit}>
+          <div className="mb-4">
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Card Number
+            </label>
+            <input
+              type="text"
+              value={paymentDetails.cardNumber}
+              onChange={(e) =>
+                setPaymentDetails({
+                  ...paymentDetails,
+                  cardNumber: e.target.value,
+                })
+              }
+              placeholder="1234 5678 9012 3456"
+              className={`w-full p-2 border rounded ${
+                isDarkMode
+                  ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                  : "bg-white border-gray-300 text-black placeholder-gray-500"
+              }`}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Expiry Date
+            </label>
+            <input
+              type="text"
+              value={paymentDetails.expiryDate}
+              onChange={(e) =>
+                setPaymentDetails({
+                  ...paymentDetails,
+                  expiryDate: e.target.value,
+                })
+              }
+              placeholder="MM/YY"
+              className={`w-full p-2 border rounded ${
+                isDarkMode
+                  ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                  : "bg-white border-gray-300 text-black placeholder-gray-500"
+              }`}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              CVV
+            </label>
+            <input
+              type="text"
+              value={paymentDetails.cvv}
+              onChange={(e) =>
+                setPaymentDetails({ ...paymentDetails, cvv: e.target.value })
+              }
+              placeholder="123"
+              className={`w-full p-2 border rounded ${
+                isDarkMode
+                  ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                  : "bg-white border-gray-300 text-black placeholder-gray-500"
+              }`}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Cardholder Name
+            </label>
+            <input
+              type="text"
+              value={paymentDetails.name}
+              onChange={(e) =>
+                setPaymentDetails({ ...paymentDetails, name: e.target.value })
+              }
+              placeholder="John Doe"
+              className={`w-full p-2 border rounded ${
+                isDarkMode
+                  ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                  : "bg-white border-gray-300 text-black placeholder-gray-500"
+              }`}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <p
+              className={`text-lg font-semibold ${
+                isDarkMode ? "text-white" : "text-black"
+              }`}
+            >
+              Amount to Pay: ₹{jobForm.budget}
+            </p>
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setShowPaymentModal(false)}
+              className={`mr-4 px-4 py-2 rounded ${
+                isDarkMode
+                  ? "bg-gray-600 text-white hover:bg-gray-700"
+                  : "bg-gray-300 text-black hover:bg-gray-400"
+              }`}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={`px-4 py-2 rounded ${
+                isDarkMode
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+            >
+              Pay Now
+            </button>
+          </div>
+        </form>
+      </Modal>
+      {/* Payment Details Modal */}
+      <Modal
+        isOpen={showPaymentDetails}
+        onRequestClose={() => setShowPaymentDetails(false)}
+        style={customStyles}
+        contentLabel="Payment Details"
+        ariaHideApp={false} // Add this to temporarily suppress warnings
+      >
+        {selectedPaymentJob && (
+          <div className="payment-details-modal">
+            <h3>Payment History for {selectedPaymentJob.title}</h3>
+            <div className="payment-list">
+              {selectedPaymentJob.payments?.map((payment, index) => (
+                <div key={index} className="payment-item">
+                  <div className="payment-date">
+                    {new Date(payment.date).toLocaleDateString()}
+                  </div>
+                  <div className="payment-amount">
+                    ₹{payment.amount?.toFixed(2)}
+                  </div>
+                  <div className="payment-percentage">
+                    {payment.percentage}% completed
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="total-paid">
+              Total Transferred: ₹{selectedPaymentJob.totalPaid?.toFixed(2)}
+            </div>
+          </div>
+        )}
+      </Modal>
+      <CompletionModal />
+      <Modal
+        isOpen={showRatingModal}
+        onRequestClose={() => setShowRatingModal(false)}
+        style={customStyles}
+        contentLabel="Rating Modal"
+      >
+        <h2
+          className={`text-xl font-bold mb-4 ${
+            isDarkMode ? "text-white" : "text-black"
+          }`}
+        >
+          Rate the Freelancer
+        </h2>
+        <form onSubmit={handleRatingSubmit}>
+          <div className="mb-4">
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Rating
+            </label>
+            <div
+              className="flex space-x-2"
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FaStar
+                  key={star}
+                  className={`cursor-pointer text-2xl ${
+                    star <= rating
+                      ? "text-yellow-400"
+                      : isDarkMode
+                      ? "text-gray-600"
+                      : "text-gray-300"
+                  }`}
+                  onClick={() => setRating(star)}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="mb-4">
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Review (Optional)
+            </label>
+            <textarea
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              className={`w-full p-2 border rounded ${
+                isDarkMode
+                  ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                  : "bg-white border-gray-300 text-black placeholder-gray-500"
+              }`}
+              rows="4"
+              placeholder="Share your experience..."
+            />
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setShowRatingModal(false)}
+              className={`mr-4 px-4 py-2 rounded ${
+                isDarkMode
+                  ? "bg-gray-600 text-white hover:bg-gray-700"
+                  : "bg-gray-300 text-black hover:bg-gray-400"
+              }`}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={`px-4 py-2 rounded ${
+                isDarkMode
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+            >
+              Submit Rating
+            </button>
+          </div>
+        </form>
+      </Modal>
     </>
   );
 };
+
 export default Dashboard;

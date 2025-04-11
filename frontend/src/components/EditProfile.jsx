@@ -19,8 +19,8 @@ const EditProfile = () => {
         const response = await axios.get('http://localhost:5000/auth/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const { name, email, skills, bio, profilePicture } = response.data;
-        setFormData({ name, email, skills: skills.join(', '), bio, profilePicture });
+        const { name, email, skills, bio, profilePicture, role } = response.data;
+        setFormData({ name, email, skills: skills.join(', '), bio, profilePicture, role });
       } catch (error) {
         console.error('Error fetching user:', error);
       }
@@ -67,8 +67,12 @@ const EditProfile = () => {
         <form onSubmit={handleSubmit}>
           <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
           <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
-          <input type="text" name="skills" value={formData.skills} onChange={handleChange} placeholder="Skills (comma separated)" />
-          <textarea name="bio" value={formData.bio} onChange={handleChange} placeholder="Bio"></textarea>
+          {formData.role === 'freelancer' && (
+            <>
+              <input type="text" name="skills" value={formData.skills} onChange={handleChange} placeholder="Skills (comma separated)" />
+              <textarea name="bio" value={formData.bio} onChange={handleChange} placeholder="Bio"></textarea>
+            </>
+          )}
           <input type="file" name="profilePicture" accept="image/*" onChange={handleChange} />
           <button type="submit" className="auth-button">Save Changes</button>
         </form>

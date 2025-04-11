@@ -9,27 +9,47 @@ const ChangePassword = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError('');
+  };
+
+  const validateForm = () => {
+    if (!formData.currentPassword) return 'Current password is required';
+    if (!formData.newPassword) return 'New password is required';
+    if (!formData.confirmPassword) return 'Confirm password is required';
+    if (formData.newPassword.length < 6) return 'New password must be at least 6 characters';
+    if (formData.newPassword !== formData.confirmPassword) return 'New password and confirm password do not match';
+    return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.newPassword !== formData.confirmPassword) {
-      alert('New password and confirm password do not match');
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
+    setLoading(true);
+    setError('');
+
     try {
       const token = localStorage.getItem('token');
-      await axios.put('http://localhost:5000/auth/change-password', formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put('http://localhost:5000/auth/change-password', 
+        { currentPassword: formData.currentPassword, newPassword: formData.newPassword },
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
       navigate('/dashboard');
     } catch (error) {
+      setError(error.response?.data?.message || 'Error changing password. Please try again.');
       console.error('Error changing password:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,11 +57,39 @@ const ChangePassword = () => {
     <div className="auth-container">
       <div className="signup-box">
         <h2>Change Password</h2>
+        {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
-          <input type="password" name="currentPassword" value={formData.currentPassword} onChange={handleChange} placeholder="Current Password" required />
-          <input type="password" name="newPassword" value={formData.newPassword} onChange={handleChange} placeholder="New Password" required />
-          <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirm New Password" required />
-          <button type="submit" className="auth-button">Change Password</button>
+          <input 
+            type="password" 
+            name="currentPassword" 
+            value={formData.currentPassword} 
+            onChange={handleChange} 
+            placeholder="Current Password" 
+            disabled={loading}
+          />
+          <input 
+            type="password" 
+            name="newPassword" 
+            value={formData.newPassword} 
+            onChange={handleChange} 
+            placeholder="New Password" 
+            disabled={loading}
+          />
+          <input 
+            type="password" 
+            name="confirmPassword" 
+            value={formData.confirmPassword} 
+            onChange={handleChange} 
+            placeholder="Confirm New Password" 
+            disabled={loading}
+          />
+          <button 
+            type="submit" 
+            className={`auth-button ${loading ? 'loading' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Changing Password...' : 'Change Password'}
+          </button>
         </form>
       </div>
     </div>

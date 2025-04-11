@@ -137,3 +137,13 @@
   gap: 1rem;
   justify-content: center;
 }
+
+.star {
+  font-size: 1.2rem;
+  margin-right: 4px;
+  color: #ccc; /* default empty color */
+}
+
+.star.filled {
+  color: gold;
+}

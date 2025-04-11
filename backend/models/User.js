@@ -8,7 +8,22 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   skills: [String],
   bio: String,
-  profilePicture: { type: String }
+  profilePicture: { type: String },
+  averageRating: {
+    type: Number,
+    default: 0,
+  },
+  ratingCount: {
+    type: Number,
+    default: 0,
+  },
+  earnings: { type: Number, default: 0 },
+  ratingCount: { type: Number, default: 0 },
+  averageRating: { type: Number, default: 0 },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 userSchema.pre('save', async function (next) {

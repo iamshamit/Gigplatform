@@ -796,6 +796,7 @@ body {
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
+  justify-content: space-between;
 }
 
 .applicant-card:hover {
@@ -832,20 +833,265 @@ body {
   gap: 8px;
 }
 
-.view-profile-btn {
-  background: none;
-  border: 2px solid var(--action-color);
-  color: var(--action-color);
-  padding: 8px 20px;
-  border-radius: 25px;
+.applicant-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.select-btn {
+  background-color: var(--action-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  min-width: 120px;
-  text-align: center;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.select-btn:hover {
+  background-color: var(--action-color-hover);
+  transform: translateY(-1px);
+}
+
+.selected-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.view-profile-btn {
+  background-color: transparent;
+  color: var(--action-color);
+  border: 1px solid var(--action-color);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
 .view-profile-btn:hover {
-  background: var(--action-color);
+  background-color: var(--action-color);
   color: white;
+}
+
+.chat-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.chat-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-1px);
+}
+
+.complete-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.complete-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-1px);
+}
+
+/* Progress bar styles */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #4CAF50;
+  transition: width 0.3s ease;
+}
+
+/* Payment summary */
+.payment-summary {
+  margin-left: auto;
+  font-weight: 600;
+  color: #2ecc71;
+}
+
+/* Payment history modal */
+.payment-history {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.payment-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+/* Payment status styles */
+.payment-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.payment-amount {
+  color: #2ecc71;
+  font-weight: 500;
+}
+
+.payment-pending {
+  color: #e67e22;
+}
+
+.payment-details-btn {
+  background: none;
+  border: none;
+  color: #3498db;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 0.9rem;
+}
+
+.payment-details-btn:hover {
+  text-decoration: underline;
+}
+
+/* Payment details modal styles */
+.payment-details-modal {
+  max-width: 500px;
+  padding: 20px;
+  background: var(--app-bg);
+  color: var(--app-content-main-color);
+  border-radius: 8px;
+}
+
+.payment-details-modal h3 {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: var(--app-content-main-color);
+  border-bottom: 1px solid var(--table-border);
+  padding-bottom: 10px;
+}
+
+.payment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.payment-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 12px;
+  background: var(--app-content-secondary-color);
+  border-radius: 6px;
+  align-items: center;
+}
+
+.payment-date {
+  color: var(--app-content-main-color);
+  font-size: 0.9rem;
+}
+
+.payment-amount {
+  color: #4CAF50;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.payment-percentage {
+  color: var(--app-content-main-color);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.total-paid {
+  margin-top: 20px;
+  padding: 12px;
+  background: var(--app-content-secondary-color);
+  border-radius: 6px;
+  text-align: right;
+  font-weight: 600;
+  color: #4CAF50;
+}
+
+.dark-mode .payment-details-modal {
+  background: var(--app-bg);
+}
+
+.dark-mode .payment-item {
+  background: var(--app-content-secondary-color);
+}
+
+.dark-mode .total-paid {
+  background: var(--app-content-secondary-color);
+}
+
+.product-cell.payment-status {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.payment-amount {
+  font-weight: 600;
+  color: #4CAF50;
+}
+
+.payment-pending {
+  color: #FF9800;
+  font-weight: 500;
+}
+
+.payment-details-btn {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s;
+}
+
+.payment-details-btn:hover {
+  background-color: #1976D2;
+}
+
+.dark-mode .payment-details-btn {
+  background-color: #1976D2;
+}
+
+.dark-mode .payment-details-btn:hover {
+  background-color: #1565C0;
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import "../profile.css";
+import { FaStar } from 'react-icons/fa';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -81,7 +82,7 @@ const Profile = () => {
           <div className="profile-actions">
             <Link to="/change-password" className="profile-button blue-button">
               Change Password
-            </Link>
+            </Link> 
             <Link
               to="/edit-profile"
               className="profile-button outline-button"
@@ -114,6 +115,28 @@ const Profile = () => {
               <strong>Bio</strong>
               <span>{user.bio || "No bio available"}</span>
             </div>
+            <div className="detail-row">
+              <strong>Rating</strong>
+              <div className="rating-display" style={{ display: 'flex', alignItems: 'center' }}>
+                <div className="stars"style={{ display: 'flex', alignItems: 'center' }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <FaStar
+                      key={star}
+                      className={`star ${star <= Math.round(user.averageRating) ? 'filled' : 'empty'}`}
+                    />
+                  ))}
+                </div>
+                <span className="rating-text">
+                  {user.averageRating.toFixed(1)} ({user.ratingCount} {user.ratingCount === 1 ? 'rating' : 'ratings'})
+                </span>
+              </div>
+            </div>
+            {isCurrentUserProfile && (
+              <div className="detail-row">
+                <strong>Earnings</strong>
+                <span>₹{user.earnings}</span>
+              </div>
+            )}
           </>
         )}
       </div>
