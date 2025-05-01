@@ -74,7 +74,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, message: "Login successful", user: { id: user._id, email, name: user.name, profileImage: user.profileImage } });
+    res.json({ token, message: "Login successful"});
 
   } catch (err) {
     console.error("Login error:", err);
@@ -130,11 +130,6 @@ router.put('/change-password', authMiddleware, async (req, res) => {
 // Get User by ID (adjusted to use profileImage)
 router.get("/getUser/:id", authMiddleware, async (req, res) => {
   try {
-    // Verify requester is either the user themselves or an employer
-    if (req.user.role !== "employer" && req.user.id !== req.params.id) {
-      return res.status(403).json({ message: "Unauthorized access" });
-    }
-
     const user = await User.findById(req.params.id)
       .select("-password -__v -createdAt -updatedAt");
 
