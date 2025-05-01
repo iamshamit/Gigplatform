@@ -64,7 +64,7 @@ const Signup = () => {
         email: formData.email,
         password: formData.password,
         role: formData.role,
-        skills: formData.skills.formData.skills.join(', '),
+        skills: formData.skills.join(', '),
         bio: formData.bio,
         profileImage: profileImageUrl,
       };
