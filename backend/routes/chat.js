@@ -19,9 +19,9 @@ router.get('/job/:jobId', authMiddleware, async (req, res) => {
     }
 
     let chat = await Chat.findOne({ job: req.params.jobId })
-      .populate('employer', 'name profilePicture')
-      .populate('freelancer', 'name profilePicture')
-      .populate('messages.sender', 'name profilePicture');
+      .populate('employer', 'name profileImage')
+      .populate('freelancer', 'name profileImage')
+      .populate('messages.sender', 'name profileImage');
 
     if (!chat) {
       // Create new chat if it doesn't exist
@@ -75,7 +75,7 @@ router.post('/job/:jobId/message', authMiddleware, async (req, res) => {
     await chat.save();
 
     // Populate sender info before sending response
-    await chat.populate('messages.sender', 'name profilePicture');
+    await chat.populate('messages.sender', 'name profileImage');
 
     res.json(chat);
   } catch (error) {
@@ -93,8 +93,8 @@ router.get('/user', authMiddleware, async (req, res) => {
       ]
     })
     .populate('job', 'title')
-    .populate('employer', 'name profilePicture')
-    .populate('freelancer', 'name profilePicture')
+    .populate('employer', 'name profileImage')
+    .populate('freelancer', 'name profileImage')
     .sort({ lastUpdated: -1 });
 
     res.json(chats);
