@@ -59,12 +59,15 @@ const Signup = () => {
       const uploadResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/upload/public-base64`, imageData);
       profileImageUrl = uploadResponse.data.imageUrl;
 
+      // Ensure formData.skills is an array before joining
+      const skills = Array.isArray(formData.skills) ? formData.skills.join(', ') : '';
+
       const userData = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
         role: formData.role,
-        skills: formData.skills.join(', '),
+        skills: skills,
         bio: formData.bio,
         profileImage: profileImageUrl,
       };
