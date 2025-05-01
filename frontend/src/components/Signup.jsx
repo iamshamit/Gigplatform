@@ -10,7 +10,7 @@ const Signup = () => {
     email: '',
     password: '',
     role: 'freelancer',
-    skills: [],
+    skills: '', // Store as a string for the input field
     bio: '',
     profileImage: null,
   });
@@ -21,9 +21,6 @@ const Signup = () => {
   const handleChange = (e) => {
     if (e.target.name === 'profileImage') {
       setFormData({ ...formData, profileImage: e.target.files[0] });
-    } else if (e.target.name === 'skills') {
-      const skills = e.target.value.split(',').map(skill => skill.trim());
-      setFormData({ ...formData, skills });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
@@ -35,6 +32,32 @@ const Signup = () => {
     setError('');
 
     try {
+      // Basic validation
+      if (!formData.name || !formData.email || !formData.password || !formData.role) {
+        throw new Error('Please fill in all required fields.');
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        throw new Error('Please enter a valid email address.');
+      }
+
+      // Validate password length
+      if (formData.password.length < 6) {
+        throw new Error('Password must be at least 6 characters long.');
+      }
+
+      // Validate skills (optional, but if provided, ensure it's not empty after trimming)
+      if (formData.skills.trim() && formData.skills.split(',').every(skill => !skill.trim())) {
+        throw new Error('Please enter valid skills (comma-separated).');
+      }
+
+      // Validate bio length (optional)
+      if (formData.bio && formData.bio.length > 500) {
+        throw new Error('Bio must not exceed 500 characters.');
+      }
+
       // Verify profileImage is a valid File object
       if (!formData.profileImage || !(formData.profileImage instanceof File)) {
         throw new Error('Please select a valid profile image.');
@@ -57,26 +80,33 @@ const Signup = () => {
 
       // Use base64 endpoint for testing
       const uploadResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/upload/public-base64`, imageData);
+      if (!uploadResponse.data.imageUrl) {
+        throw new Error('Failed to upload profile image.');
+      }
       profileImageUrl = uploadResponse.data.imageUrl;
 
-      // Ensure formData.skills is an array before joining
-      const skills = Array.isArray(formData.skills) ? formData.skills.join(', ') : '';
+      // Convert the skills string to an array for submission
+      const skillsArray = formData.skills
+        .split(',')
+        .map(skill => skill.trim())
+        .filter(skill => skill);
 
       const userData = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
         role: formData.role,
-        skills: skills,
+        skills: skillsArray.join(', '), // Send as a comma-separated string to match backend expectation
         bio: formData.bio,
         profileImage: profileImageUrl,
       };
 
-      await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/signup`, userData);
-      toast.success('Signup successful! Please login.');
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/signup`, userData);
+      toast.success(response.data.message || 'Signup successful! Please login.');
       navigate('/login');
     } catch (err) {
-      setError(err.message || 'Failed to sign up.');
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to sign up.';
+      setError(errorMessage);
       console.error('Signup error:', err);
     } finally {
       setLoading(false);
@@ -144,6 +174,7 @@ const Signup = () => {
             name="profileImage"
             accept="image/*"
             onChange={handleChange}
+            required
           />
           <button
             type="submit"
