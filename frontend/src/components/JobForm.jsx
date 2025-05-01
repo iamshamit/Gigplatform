@@ -43,7 +43,7 @@ const JobForm = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/jobs', formData, {
+      await axios.post('https://gigplatform.onrender.com/jobs', formData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

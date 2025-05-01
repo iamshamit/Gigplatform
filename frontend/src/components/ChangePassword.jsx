@@ -40,7 +40,7 @@ const ChangePassword = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.put('http://localhost:5000/auth/change-password', 
+      await axios.put('https://gigplatform.onrender.com/auth/change-password', 
         { currentPassword: formData.currentPassword, newPassword: formData.newPassword },
         { headers: { Authorization: `Bearer ${token}` }}
       );

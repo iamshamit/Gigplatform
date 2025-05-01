@@ -18,7 +18,7 @@ const Profile = () => {
         const token = localStorage.getItem("token");
         
         // Get current user ID
-        const currentUserRes = await axios.get("http://localhost:5000/auth/me", {
+        const currentUserRes = await axios.get("https://gigplatform.onrender.com/auth/me", {
           headers: { Authorization: `Bearer ${token}` }
         });
         setCurrentUserId(currentUserRes.data._id);
@@ -26,7 +26,7 @@ const Profile = () => {
         // Get profile data
         if (userId) {
           const profileRes = await axios.get(
-            `http://localhost:5000/auth/getUser/${userId}`,
+            `https://gigplatform.onrender.com/auth/getUser/${userId}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           setUser(profileRes.data);
@@ -71,13 +71,12 @@ const Profile = () => {
     <div className="fullscreen-container">
       <div className="profile-card">
         <img
-          src={`http://localhost:5000/uploads/${user.profilePicture || "default.png"}`}
+          src={`${user.profileImage || "default.png"}`}
           alt="Profile"
           className="profile-image"
         />
         <h2>{user.name}</h2>
-        <p>{user.title || `${user.role.charAt(0).toUpperCase() + user.role.slice(1)}`}</p>
-
+        <p>{user.role}</p>
         {isCurrentUserProfile && (
           <div className="profile-actions">
             <Link to="/change-password" className="profile-button blue-button">

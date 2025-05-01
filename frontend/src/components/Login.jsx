@@ -13,7 +13,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', { email, password });
+      const response = await axios.post('https://gigplatform.onrender.com/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
       toast.success('Login successful!');

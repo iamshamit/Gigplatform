@@ -161,7 +161,7 @@ const Dashboard = () => {
   const handleDeleteJob = async (jobId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/jobs/${jobId}`, {
+      await axios.delete(`https://gigplatform.onrender.com/jobs/${jobId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -186,7 +186,7 @@ const Dashboard = () => {
   const fetchApplicants = async () => {
     const token = localStorage.getItem("token");
     const response = await axios.get(
-      "http://localhost:5000/jobs/employer/applicants",
+      "https://gigplatform.onrender.com/jobs/employer/applicants",
       { headers: { Authorization: `Bearer ${token}` } }
     );
     return response.data;
@@ -195,7 +195,7 @@ const Dashboard = () => {
   const fetchApplicantDetails = async (jobId) => {
     const token = localStorage.getItem("token");
     const response = await axios.get(
-      `http://localhost:5000/jobs/${jobId}/applicants`,
+      `https://gigplatform.onrender.com/jobs/${jobId}/applicants`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     return response.data;
@@ -205,7 +205,7 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(`http://localhost:5000/jobs/${jobId}/apply`, {
+      await axios.delete(`https://gigplatform.onrender.com/jobs/${jobId}/apply`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -534,7 +534,7 @@ const JobRow = ({ job, index, onClick }) => {
   const fetchJobDetails = useCallback(async (jobId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:5000/jobs/${jobId}`, {
+      const response = await axios.get(`https://gigplatform.onrender.com/jobs/${jobId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSelectedJob(response.data);
@@ -570,7 +570,7 @@ const JobRow = ({ job, index, onClick }) => {
       );
 
       await axios.post(
-        `http://localhost:5000/jobs/${selectedJob._id}/apply`,
+        `https://gigplatform.onrender.com/jobs/${selectedJob._id}/apply`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -591,7 +591,7 @@ const JobRow = ({ job, index, onClick }) => {
     "currentUser",
     async () => {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/auth/me", {
+      const response = await axios.get("https://gigplatform.onrender.com/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -608,11 +608,11 @@ const JobRow = ({ job, index, onClick }) => {
     async () => {
       const token = localStorage.getItem("token");
 
-      let endpoint = "http://localhost:5000/jobs/";
+      let endpoint = "https://gigplatform.onrender.com/jobs/";
       if (currentUser?.role === "employer") {
-        endpoint = `http://localhost:5000/jobs/employer/${currentUser._id}`;
+        endpoint = `https://gigplatform.onrender.com/jobs/employer/${currentUser._id}`;
       } else if (activeTab === "applied-jobs") {
-        endpoint = `http://localhost:5000/jobs/applied/${currentUser._id}`;
+        endpoint = `https://gigplatform.onrender.com/jobs/applied/${currentUser._id}`;
       }
 
       console.log("Fetching jobs from endpoint:", endpoint);
@@ -673,7 +673,7 @@ const JobRow = ({ job, index, onClick }) => {
       // Simulate successful payment
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:5000/jobs/",
+        "https://gigplatform.onrender.com/jobs/",
         {
           ...jobForm,
           employer: user._id,
@@ -760,7 +760,7 @@ const JobRow = ({ job, index, onClick }) => {
       try {
         const token = localStorage.getItem("token");
         await axios.post(
-          `http://localhost:5000/jobs/${jobId}/select-applicant`,
+          `https://gigplatform.onrender.com/jobs/${jobId}/select-applicant`,
           { applicantId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -840,10 +840,7 @@ const JobRow = ({ job, index, onClick }) => {
                         >
                           <div className="applicant-info">
                             <img
-                              src={`http://localhost:5000/uploads/${
-                                detailedApplicants[index].profilePicture ||
-                                "default.png"
-                              }`}
+                              src={`${detailedApplicants[index].profileImage || "default.png"}`}
                               alt="Applicant"
                               className="applicant-avatar"
                             />
@@ -875,7 +872,7 @@ const JobRow = ({ job, index, onClick }) => {
                                   async () => {
                                     const token = localStorage.getItem("token");
                                     const { data } = await axios.get(
-                                      `http://localhost:5000/jobs/${job._id}/selected-applicant`,
+                                      `https://gigplatform.onrender.com/jobs/${job._id}/selected-applicant`,
                                       {
                                         headers: {
                                           Authorization: `Bearer ${token}`,
@@ -954,7 +951,7 @@ const JobRow = ({ job, index, onClick }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.patch(
-        `http://localhost:5000/jobs/${selectedJobForCompletion}/complete`,
+        `https://gigplatform.onrender.com/jobs/${selectedJobForCompletion}/complete`,
         { completionPercentage },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -1192,7 +1189,7 @@ const JobRow = ({ job, index, onClick }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:5000/jobs/${selectedJobForCompletion}/rate`,
+        `https://gigplatform.onrender.com/jobs/${selectedJobForCompletion}/rate`,
         { rating, review },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -1440,9 +1437,9 @@ const JobRow = ({ job, index, onClick }) => {
           </ul>
           <div className="account-info">
             <div className="account-info-picture">
-              {user.profilePicture && (
+              {user.profileImage && (
                 <img
-                  src={`http://localhost:5000/uploads/${user.profilePicture}`}
+                  src={`${user.profileImage}`}
                   alt="Account"
                 />
               )}

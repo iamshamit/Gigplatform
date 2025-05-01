@@ -13,7 +13,7 @@ const JobList = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`http://localhost:5000/jobs?page=${page}&limit=${JOBS_PER_PAGE}`);
+      const response = await axios.get(`https://gigplatform.onrender.com/jobs?page=${page}&limit=${JOBS_PER_PAGE}`);
       const newJobs = response.data.jobs || response.data;
       setJobs(prevJobs => page === 1 ? newJobs : [...prevJobs, ...newJobs]);
       setHasMore(newJobs.length === JOBS_PER_PAGE);
@@ -32,7 +32,7 @@ const JobList = () => {
   const applyForJob = async (jobId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/jobs/${jobId}/apply`, {}, {
+      await axios.post(`https://gigplatform.onrender.com/jobs/${jobId}/apply`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('Applied successfully!');

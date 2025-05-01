@@ -48,7 +48,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const job = await Job.findById(req.params.id).populate(
       "employer",
-      "name email"
+      "name email profileImage"
     );
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
@@ -105,7 +105,7 @@ router.get('/employer/applicants', authMiddleware, async (req, res) => {
           pipeline: [{
             $project: { 
               name: 1,
-              profilePicture: 1,
+              profileImage: 1, // Updated field name
               skills: { $slice: ["$skills", 5] },
               _id: 1 
             }
@@ -117,7 +117,7 @@ router.get('/employer/applicants', authMiddleware, async (req, res) => {
           title: 1,
           status: 1, 
           "applicants.name": 1,
-          "applicants.profilePicture": 1,
+          "applicants.profileImage": 1, // Updated field name
           "applicants.skills": 1,
           "applicants._id": 1
         } 
@@ -134,7 +134,7 @@ router.get('/employer/applicants', authMiddleware, async (req, res) => {
 router.get('/:jobId/applicants', async (req, res) => {
   try {
     const job = await Job.findById(req.params.jobId)
-      .populate('applicants', 'name profilePicture skills');
+      .populate('applicants', 'name profileImage skills'); // Updated field name
       
     if (!job) return res.status(404).json({ message: 'Job not found' });
     res.json(job.applicants);
@@ -155,8 +155,8 @@ router.get("/employer/:employerId", authMiddleware, async (req, res) => {
     // Fetch jobs where the employer field matches the employerId
     const jobs = await Job.find({ employer: employerId }).populate(
       "employer",
-      "name email"
-    ); // Populate employer details
+      "name email profileImage" // Updated field name
+    );
 
     // If no jobs are found, return a 404 response
     if (!jobs || jobs.length === 0) {
@@ -295,7 +295,7 @@ router.get("/:jobId/selected-applicant", authMiddleware, async (req, res) => {
 
   try {
     // Find the job by its ID and populate the selectedApplicant field with specific user fields
-    const job = await Job.findById(req.params.jobId).populate("selectedApplicant", "name email profilePicture");
+    const job = await Job.findById(req.params.jobId).populate("selectedApplicant", "name email profileImage");
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });

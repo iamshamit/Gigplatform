@@ -1,29 +1,37 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const upload = require('../multerConfig');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Middleware to Parse FormData Manually (Fix for `email` missing)
+// Middleware to Parse FormData Manually
 const parseFormData = (req, res, next) => {
   console.log("Raw Request Body:", req.body);
   
-  // Convert skills to an array
+  // Convert skills to an array if it's a string
   if (req.body.skills) {
-    req.body.skills = req.body.skills.split(',').map(skill => skill.trim());
+    console.log("Skills input type:", typeof req.body.skills, req.body.skills);
+    if (typeof req.body.skills === 'string') {
+      req.body.skills = req.body.skills.split(',').map(skill => skill.trim()).filter(skill => skill);
+    } else if (Array.isArray(req.body.skillas)) {
+      req.body.skills = req.body.skills.map(skill => skill.trim()).filter(skill => skill);
+    } else {
+      console.warn("Unexpected skills type:", typeof req.body.skills);
+      req.body.skills = [];
+    }
+  } else {
+    req.body.skills = [];
   }
   
   next();
 };
 
 // Signup Route
-router.post('/signup', upload.single('profilePicture'), parseFormData, async (req, res) => {
+router.post('/signup', parseFormData, async (req, res) => {
   try {
     console.log("Received Signup Request");
 
-    // Extract fields
-    const { email, password, role, name, bio, skills = [] } = req.body;
+    const { email, password, role, name, bio, skills = [], profileImage } = req.body;
 
     if (!email || !password || !role || !name) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -34,15 +42,6 @@ router.post('/signup', upload.single('profilePicture'), parseFormData, async (re
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // ✅ Check if a file was uploaded and store its filename
-    let profilePicture = null;
-    if (req.file) {
-      console.log("Uploaded File:", req.file); // Debugging log
-      profilePicture = req.file.filename.toString(); // ✅ Store the renamed file
-    } else {
-      console.log("No profile picture uploaded.");
-    }
-
     const user = new User({
       email,
       password,
@@ -50,11 +49,11 @@ router.post('/signup', upload.single('profilePicture'), parseFormData, async (re
       name,
       skills,
       bio,
-      profilePicture
+      profileImage: profileImage || '', // Use provided ImgBB URL or empty string
     });
 
     await user.save();
-    res.status(201).json({ message: "User created successfully", profilePicture });
+    res.status(201).json({ message: "User created successfully", profileImage: user.profileImage });
 
   } catch (err) {
     console.error("Signup error:", err);
@@ -75,7 +74,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, message: "Login successful" });
+    res.json({ token, message: "Login successful", user: { id: user._id, email, name: user.name, profileImage: user.profileImage } });
 
   } catch (err) {
     console.error("Login error:", err);
@@ -94,13 +93,13 @@ router.get('/me', authMiddleware, async (req, res) => {
 });
 
 // Update Profile
-router.put('/me', authMiddleware, upload.single('profilePicture'), parseFormData, async (req, res) => {
+router.put('/me', authMiddleware, parseFormData, async (req, res) => {
   try {
-    const { name, email, skills, bio } = req.body;
+    const { name, email, skills, bio, profileImage } = req.body;
     const updateData = { name, email, skills, bio };
 
-    if (req.file) {
-      updateData.profilePicture = req.file.filename;
+    if (profileImage) {
+      updateData.profileImage = profileImage; // Use provided ImgBB URL
     }
 
     const user = await User.findByIdAndUpdate(req.user.id, updateData, { new: true }).select('-password');
@@ -128,22 +127,7 @@ router.put('/change-password', authMiddleware, async (req, res) => {
   }
 });
 
-router.get("/getUser/:id", authMiddleware, async (req, res) => {
-  try {
-    
-    const user = await User.findById(req.params.id).select("-password");
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.json(user);
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
+// Get User by ID (adjusted to use profileImage)
 router.get("/getUser/:id", authMiddleware, async (req, res) => {
   try {
     // Verify requester is either the user themselves or an employer
@@ -161,8 +145,6 @@ router.get("/getUser/:id", authMiddleware, async (req, res) => {
     // If requester is employer, hide sensitive fields
     if (req.user.role === "employer") {
       const safeUser = user.toObject();
-      delete safeUser.email;
-      delete safeUser.role;
       return res.json(safeUser);
     }
 

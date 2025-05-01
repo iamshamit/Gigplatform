@@ -1,7 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const User = require('../models/User'); // Ensure this path is correct
+const User = require('../models/User');
 
 const authMiddleware = async (req, res, next) => {
   const authHeader = req.header('Authorization');

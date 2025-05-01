@@ -10,7 +10,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://gigplatform.onrender.com",
     methods: ["GET", "POST"]
   }
 });
@@ -29,13 +29,12 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 const jobRoutes = require('./routes/jobs');
 const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
+const uploadRoutes = require('./routes/upload');
 app.use('/jobs', jobRoutes);
 app.use('/auth', authRoutes);
 app.use('/chat', chatRoutes);
+app.use('/upload', uploadRoutes);
 
-// Serve static files
-const path = require('path');
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // WebSocket connection handling
 io.on('connection', (socket) => {

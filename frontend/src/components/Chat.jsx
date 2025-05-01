@@ -35,7 +35,7 @@ const Chat = () => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/auth/me', {
+        const response = await axios.get('https://gigplatform.onrender.com/auth/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(response.data);
@@ -52,7 +52,7 @@ const Chat = () => {
     if (!user || !jobId) return;
 
     // Initialize socket with optimized settings
-    socket.current = io('http://localhost:5000', {
+    socket.current = io('https://gigplatform.onrender.com', {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
@@ -114,7 +114,7 @@ const Chat = () => {
           setLoading(false);
         }
 
-        const response = await axios.get(`http://localhost:5000/chat/job/${jobId}`, {
+        const response = await axios.get(`https://gigplatform.onrender.com/chat/job/${jobId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -188,7 +188,7 @@ const Chat = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        `http://localhost:5000/chat/job/${jobId}/message`,
+        `https://gigplatform.onrender.com/chat/job/${jobId}/message`,
         { content: messageContent },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -247,7 +247,7 @@ const Chat = () => {
           </svg>
         </button>
         <img
-          src={`http://localhost:5000/uploads/${otherUser.profilePicture || 'default.png'}`}
+          src={`https://gigplatform.onrender.com/uploads/${otherUser.profilePicture || 'default.png'}`}
           alt={otherUser.name}
           className="chat-avatar"
         />
@@ -289,7 +289,7 @@ const Chat = () => {
             className={`message ${message.sender._id === user._id ? 'sent' : 'received'}`}
           >
             <img
-              src={`http://localhost:5000/uploads/${message.sender.profilePicture || 'default.png'}`}
+              src={`https://gigplatform.onrender.com/uploads/${message.sender.profilePicture || 'default.png'}`}
               alt={message.sender.name}
               className="message-avatar"
             />

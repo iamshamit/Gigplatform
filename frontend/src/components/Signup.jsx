@@ -3,22 +3,24 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../AuthForm.css';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
     role: 'freelancer',
-    name: '',
     skills: [],
     bio: '',
-    profilePicture: null
+    profileImage: null,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+
   const handleChange = (e) => {
-    if (e.target.name === 'profilePicture') {
-      setFormData({ ...formData, profilePicture: e.target.files[0] });
+    if (e.target.name === 'profileImage') {
+      setFormData({ ...formData, profileImage: e.target.files[0] });
     } else if (e.target.name === 'skills') {
       const skills = e.target.value.split(',').map(skill => skill.trim());
       setFormData({ ...formData, skills });
@@ -29,61 +31,125 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const data = new FormData();
-    data.append("email", formData.email);
-    data.append("password", formData.password);
-    data.append("role", formData.role);
-    data.append("name", formData.name);
-    data.append("bio", formData.bio);
-    data.append("skills", formData.skills.join(',')); // Convert array to string
-    if (formData.profilePicture) {
-      data.append("profilePicture", formData.profilePicture);
-    }
+    setLoading(true);
+    setError('');
 
     try {
-      await axios.post('http://localhost:5000/auth/signup', data, {
-        headers: { "Content-Type": "multipart/form-data" }
+      // Verify profileImage is a valid File object
+      if (!formData.profileImage || !(formData.profileImage instanceof File)) {
+        throw new Error('Please select a valid profile image.');
+      }
+
+      console.log('Selected file:', {
+        name: formData.profileImage.name,
+        type: formData.profileImage.type,
+        size: formData.profileImage.size,
       });
+
+      let profileImageUrl = '';
+      const imageData = new FormData();
+      imageData.append('image', formData.profileImage);
+
+      // Log FormData entries for debugging
+      for (let pair of imageData.entries()) {
+        console.log('FormData entry:', pair[0], pair[1]);
+      }
+
+      // Use base64 endpoint for testing
+      const uploadResponse = await axios.post('https://gigplatform.onrender.com/upload/public-base64', imageData);
+      profileImageUrl = uploadResponse.data.imageUrl;
+
+      const userData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        skills: formData.skills,
+        bio: formData.bio,
+        profileImage: profileImageUrl,
+      };
+
+      await axios.post('https://gigplatform.onrender.com/auth/signup', userData);
+      toast.success('Signup successful! Please login.');
       navigate('/login');
-      toast.success('Signup successful! Please log in.');
-      setFormData({
-        email: '',
-        password: '',
-        role: 'freelancer',
-        name: '',
-        skills: [],
-        bio: '',
-        profilePicture: null
-      });
-    } catch (error) {
-      console.error('Error signing up:', error.response?.data || error.message);
-      alert('Signup failed!');
+    } catch (err) {
+      setError(err.message || 'Failed to sign up.');
+      console.error('Signup error:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
       <div className="signup-box">
-        <h2>Signup</h2>
+        <h2>Sign Up</h2>
+        {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
-          <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
-          <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
-          {formData.role === 'freelancer' && (
-            <>
-              <input type="text" name="skills" value={formData.skills} onChange={handleChange} placeholder="Skills (comma separated)" />
-              <textarea name="bio" value={formData.bio} onChange={handleChange} placeholder="Bio"></textarea>
-            </>
-          )}
-          <input type="file" name="profilePicture" accept="image/*" onChange={handleChange} />
-          <select name="role" value={formData.role} onChange={handleChange}>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Name"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Email"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Password"
+            required
+          />
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            required
+          >
             <option value="freelancer">Freelancer</option>
             <option value="employer">Employer</option>
           </select>
-          <button type="submit" className="auth-button">Signup</button>
+          {formData.role === 'freelancer' && (
+            <>
+              <input
+                type="text"
+                name="skills"
+                value={formData.skills.join(', ')}
+                onChange={handleChange}
+                placeholder="Skills (comma separated)"
+              />
+              <textarea
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                placeholder="Bio"
+              />
+            </>
+          )}
+          <input
+            type="file"
+            name="profileImage"
+            accept="image/*"
+            onChange={handleChange}
+          />
+          <button
+            type="submit"
+            className={`auth-button ${loading ? 'loading' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Signing Up...' : 'Sign Up'}
+          </button>
         </form>
-        <p className="auth-link">Already a member? <a href="/login">Login now</a></p>
       </div>
     </div>
   );

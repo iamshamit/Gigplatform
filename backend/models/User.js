@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   skills: [String],
   bio: String,
-  profilePicture: { type: String },
+  profileImage: { type: String, default: '' },
   averageRating: {
     type: Number,
     default: 0,
