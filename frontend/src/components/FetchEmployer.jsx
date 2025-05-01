@@ -19,7 +19,7 @@ const FetchEmployer = ({ employerId }) => {
         const id = typeof employerId === "object" ? employerId._id : employerId;
 
         const response = await axios.get(
-          `https://gigplatform.onrender.com/auth/getUser/${id}`,
+          `${import.meta.env.VITE_BASE_URL}/auth/getUser/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 

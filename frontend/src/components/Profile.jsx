@@ -18,7 +18,7 @@ const Profile = () => {
         const token = localStorage.getItem("token");
         
         // Get current user ID
-        const currentUserRes = await axios.get("https://gigplatform.onrender.com/auth/me", {
+        const currentUserRes = await axios.get(`${import.meta.env.VITE_BASE_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setCurrentUserId(currentUserRes.data._id);
@@ -26,7 +26,7 @@ const Profile = () => {
         // Get profile data
         if (userId) {
           const profileRes = await axios.get(
-            `https://gigplatform.onrender.com/auth/getUser/${userId}`,
+            `${import.meta.env.VITE_BASE_URL}/auth/getUser/${userId}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           setUser(profileRes.data);

@@ -16,7 +16,7 @@ const EditProfile = () => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('https://gigplatform.onrender.com/auth/me', {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const { name, email, skills, bio, profilePicture, role } = response.data;
@@ -51,7 +51,7 @@ const EditProfile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.put('https://gigplatform.onrender.com/auth/me', data, {
+      await axios.put(`${import.meta.env.VITE_BASE_URL}/auth/me`, data, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
       });
       navigate('/dashboard');

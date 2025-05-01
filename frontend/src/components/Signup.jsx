@@ -56,7 +56,7 @@ const Signup = () => {
       }
 
       // Use base64 endpoint for testing
-      const uploadResponse = await axios.post('https://gigplatform.onrender.com/upload/public-base64', imageData);
+      const uploadResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/upload/public-base64`, imageData);
       profileImageUrl = uploadResponse.data.imageUrl;
 
       const userData = {
@@ -69,7 +69,7 @@ const Signup = () => {
         profileImage: profileImageUrl,
       };
 
-      await axios.post('https://gigplatform.onrender.com/auth/signup', userData);
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/signup`, userData);
       toast.success('Signup successful! Please login.');
       navigate('/login');
     } catch (err) {

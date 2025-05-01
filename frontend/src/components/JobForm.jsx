@@ -43,7 +43,7 @@ const JobForm = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://gigplatform.onrender.com/jobs', formData, {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/jobs`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

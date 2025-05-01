@@ -161,7 +161,7 @@ const Dashboard = () => {
   const handleDeleteJob = async (jobId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://gigplatform.onrender.com/jobs/${jobId}`, {
+      await axios.delete(`${import.meta.env.VITE_BASE_URL}/jobs/${jobId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -186,7 +186,7 @@ const Dashboard = () => {
   const fetchApplicants = async () => {
     const token = localStorage.getItem("token");
     const response = await axios.get(
-      "https://gigplatform.onrender.com/jobs/employer/applicants",
+      `${import.meta.env.VITE_BASE_URL}/jobs/employer/applicants`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     return response.data;
@@ -195,7 +195,7 @@ const Dashboard = () => {
   const fetchApplicantDetails = async (jobId) => {
     const token = localStorage.getItem("token");
     const response = await axios.get(
-      `https://gigplatform.onrender.com/jobs/${jobId}/applicants`,
+      `${import.meta.env.VITE_BASE_URL}/jobs/${jobId}/applicants`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     return response.data;
@@ -205,7 +205,7 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(`https://gigplatform.onrender.com/jobs/${jobId}/apply`, {
+      await axios.delete(`${import.meta.env.VITE_BASE_URL}/jobs/${jobId}/apply`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -534,7 +534,7 @@ const JobRow = ({ job, index, onClick }) => {
   const fetchJobDetails = useCallback(async (jobId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`https://gigplatform.onrender.com/jobs/${jobId}`, {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/jobs/${jobId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSelectedJob(response.data);
@@ -570,7 +570,7 @@ const JobRow = ({ job, index, onClick }) => {
       );
 
       await axios.post(
-        `https://gigplatform.onrender.com/jobs/${selectedJob._id}/apply`,
+        `${import.meta.env.VITE_BASE_URL}/jobs/${selectedJob._id}/apply`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -591,7 +591,7 @@ const JobRow = ({ job, index, onClick }) => {
     "currentUser",
     async () => {
       const token = localStorage.getItem("token");
-      const response = await axios.get("https://gigplatform.onrender.com/auth/me", {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -608,11 +608,11 @@ const JobRow = ({ job, index, onClick }) => {
     async () => {
       const token = localStorage.getItem("token");
 
-      let endpoint = "https://gigplatform.onrender.com/jobs/";
+      let endpoint = `${import.meta.env.VITE_BASE_URL}/jobs/`;
       if (currentUser?.role === "employer") {
-        endpoint = `https://gigplatform.onrender.com/jobs/employer/${currentUser._id}`;
+        endpoint = `${import.meta.env.VITE_BASE_URL}/jobs/employer/${currentUser._id}`;
       } else if (activeTab === "applied-jobs") {
-        endpoint = `https://gigplatform.onrender.com/jobs/applied/${currentUser._id}`;
+        endpoint = `${import.meta.env.VITE_BASE_URL}/jobs/applied/${currentUser._id}`;
       }
 
       console.log("Fetching jobs from endpoint:", endpoint);
@@ -673,7 +673,7 @@ const JobRow = ({ job, index, onClick }) => {
       // Simulate successful payment
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "https://gigplatform.onrender.com/jobs/",
+        `${import.meta.env.VITE_BASE_URL}/jobs/`,
         {
           ...jobForm,
           employer: user._id,
@@ -760,7 +760,7 @@ const JobRow = ({ job, index, onClick }) => {
       try {
         const token = localStorage.getItem("token");
         await axios.post(
-          `https://gigplatform.onrender.com/jobs/${jobId}/select-applicant`,
+          `${import.meta.env.VITE_BASE_URL}/jobs/${jobId}/select-applicant`,
           { applicantId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -872,7 +872,7 @@ const JobRow = ({ job, index, onClick }) => {
                                   async () => {
                                     const token = localStorage.getItem("token");
                                     const { data } = await axios.get(
-                                      `https://gigplatform.onrender.com/jobs/${job._id}/selected-applicant`,
+                                      `${import.meta.env.VITE_BASE_URL}/jobs/${job._id}/selected-applicant`,
                                       {
                                         headers: {
                                           Authorization: `Bearer ${token}`,
@@ -951,7 +951,7 @@ const JobRow = ({ job, index, onClick }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.patch(
-        `https://gigplatform.onrender.com/jobs/${selectedJobForCompletion}/complete`,
+        `${import.meta.env.VITE_BASE_URL}/jobs/${selectedJobForCompletion}/complete`,
         { completionPercentage },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -1189,7 +1189,7 @@ const JobRow = ({ job, index, onClick }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `https://gigplatform.onrender.com/jobs/${selectedJobForCompletion}/rate`,
+        `${import.meta.env.VITE_BASE_URL}/jobs/${selectedJobForCompletion}/rate`,
         { rating, review },
         { headers: { Authorization: `Bearer ${token}` } }
       );

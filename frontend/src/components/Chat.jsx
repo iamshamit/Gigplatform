@@ -35,7 +35,7 @@ const Chat = () => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('https://gigplatform.onrender.com/auth/me', {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(response.data);
@@ -52,7 +52,7 @@ const Chat = () => {
     if (!user || !jobId) return;
 
     // Initialize socket with optimized settings
-    socket.current = io('https://gigplatform.onrender.com', {
+    socket.current = io(`${import.meta.env.VITE_BASE_URL}`, {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
@@ -329,4 +329,4 @@ const Chat = () => {
   );
 };
 
-export default Chat; 
+export default Chat;
