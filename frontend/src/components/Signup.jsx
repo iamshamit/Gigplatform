@@ -64,7 +64,7 @@ const Signup = () => {
         email: formData.email,
         password: formData.password,
         role: formData.role,
-        skills: formData.skills,
+        skills: formData.skills.formData.skills.join(', '),
         bio: formData.bio,
         profileImage: profileImageUrl,
       };
@@ -124,7 +124,7 @@ const Signup = () => {
               <input
                 type="text"
                 name="skills"
-                value={formData.skills.join(', ')}
+                value={formData.skills}
                 onChange={handleChange}
                 placeholder="Skills (comma separated)"
               />

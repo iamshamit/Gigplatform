@@ -31,7 +31,7 @@ router.post('/signup', parseFormData, async (req, res) => {
   try {
     console.log("Received Signup Request");
 
-    const { email, password, role, name, bio, skills = [], profileImage } = req.body;
+    const { email, password, role, name, bio, skills, profileImage } = req.body;
 
     if (!email || !password || !role || !name) {
       return res.status(400).json({ message: "Missing required fields" });
