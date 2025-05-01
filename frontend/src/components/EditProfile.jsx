@@ -8,7 +8,8 @@ const EditProfile = () => {
     email: '',
     skills: '',
     bio: '',
-    profilePicture: null
+    profileImage: null,
+    profileImageUrl: '' // Store the uploaded image URL here
   });
   const navigate = useNavigate();
 
@@ -19,8 +20,8 @@ const EditProfile = () => {
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const { name, email, skills, bio, profilePicture, role } = response.data;
-        setFormData({ name, email, skills: skills.join(', '), bio, profilePicture, role });
+        const { name, email, skills, bio, profileImage, role } = response.data;
+        setFormData({ name, email, skills: skills.join(', '), bio, profileImage, role });
       } catch (error) {
         console.error('Error fetching user:', error);
       }
@@ -30,10 +31,26 @@ const EditProfile = () => {
   }, []);
 
   const handleChange = (e) => {
-    if (e.target.name === 'profilePicture') {
-      setFormData({ ...formData, profilePicture: e.target.files[0] });
+    if (e.target.name === 'profileImage') {
+      setFormData({ ...formData, profileImage: e.target.files[0] });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
+  };
+
+  const handleImageUpload = async (file) => {
+    const data = new FormData();
+    data.append('profileImage', file);
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/upload/image`, data, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+      });
+      const { imageUrl } = response.data; // Assuming the backend returns the image URL
+      setFormData({ ...formData, profileImageUrl: imageUrl }); // Save the URL in state
+    } catch (error) {
+      console.error('Error uploading image:', error);
     }
   };
 
@@ -45,8 +62,8 @@ const EditProfile = () => {
     data.append('email', formData.email);
     data.append('skills', formData.skills);
     data.append('bio', formData.bio);
-    if (formData.profilePicture) {
-      data.append('profilePicture', formData.profilePicture);
+    if (formData.profileImageUrl) {
+      data.append('profileImage', formData.profileImageUrl); // Use the URL here instead of the file
     }
 
     try {
@@ -73,7 +90,7 @@ const EditProfile = () => {
               <textarea name="bio" value={formData.bio} onChange={handleChange} placeholder="Bio"></textarea>
             </>
           )}
-          <input type="file" name="profilePicture" accept="image/*" onChange={handleChange} />
+          <input type="file" name="profileImage" accept="image/*" onChange={(e) => handleImageUpload(e.target.files[0])} />
           <button type="submit" className="auth-button">Save Changes</button>
         </form>
       </div>

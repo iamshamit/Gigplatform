@@ -247,7 +247,7 @@ const Chat = () => {
           </svg>
         </button>
         <img
-          src={`https://gigplatform.onrender.com/uploads/${otherUser.profilePicture || 'default.png'}`}
+          src={`${otherUser.profileImage || 'default.png'}`}
           alt={otherUser.name}
           className="chat-avatar"
         />
@@ -289,7 +289,7 @@ const Chat = () => {
             className={`message ${message.sender._id === user._id ? 'sent' : 'received'}`}
           >
             <img
-              src={`https://gigplatform.onrender.com/uploads/${message.sender.profilePicture || 'default.png'}`}
+              src={`${otherUser.profileImage || 'default.png'}`}
               alt={message.sender.name}
               className="message-avatar"
             />

@@ -13,7 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 import Select from "react-select";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FixedSizeList as List } from "react-window";
 import { FaStar } from "react-icons/fa";
 
@@ -587,34 +587,33 @@ const JobRow = ({ job, index, onClick }) => {
     }
   }, [selectedJob, user._id]);
 
-  const { data: currentUser } = useQuery(
-    "currentUser",
-    async () => {
+  const { data: currentUser } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
     },
-    {
-      onError: (error) => {
-        if ([401, 400].includes(error.response?.status)) navigate("/login");
-      },
-    }
-  );
+    onError: (error) => {
+      if ([401, 400].includes(error.response?.status)) navigate("/login");
+    },
+  });
+  
 
-  const { data: jobsData, isLoading: jobsLoading } = useQuery(
-    ["jobs", activeTab, currentUser?._id],
-    async () => {
+  const { data: jobsData, isLoading: jobsLoading } = useQuery({
+    queryKey: ["jobs", activeTab, currentUser?._id],
+    queryFn: async () => {
       const token = localStorage.getItem("token");
-
+  
       let endpoint = `${import.meta.env.VITE_BASE_URL}/jobs/`;
       if (currentUser?.role === "employer") {
         endpoint = `${import.meta.env.VITE_BASE_URL}/jobs/employer/${currentUser._id}`;
       } else if (activeTab === "applied-jobs") {
         endpoint = `${import.meta.env.VITE_BASE_URL}/jobs/applied/${currentUser._id}`;
       }
-
+  
       console.log("Fetching jobs from endpoint:", endpoint);
       const response = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
@@ -622,12 +621,11 @@ const JobRow = ({ job, index, onClick }) => {
       console.log("Received jobs data:", response.data);
       return response.data;
     },
-    {
-      enabled: !!currentUser?._id && activeTab !== "applicants",
-      staleTime: 0, // Force fresh data on tab change
-      refetchOnWindowFocus: false,
-    }
-  );
+    enabled: !!currentUser?._id && activeTab !== "applicants",
+    staleTime: 0, // Force fresh data on tab change
+    refetchOnWindowFocus: false,
+  });
+  
 
   useEffect(() => {
     if (currentUser?._id && activeTab !== "applicants") {
@@ -730,15 +728,14 @@ const JobRow = ({ job, index, onClick }) => {
 
   const ApplicantsView = ({ isDarkMode }) => {
     const [selectedJob, setSelectedJob] = useState(null);
-    const { data: applications = [], refetch } = useQuery(
-      "applicants",
-      fetchApplicants,
-      {
-        enabled: activeTab === "applicants",
-        staleTime: 0,
-        select: (data) => data.filter((job) => job.status !== "completed"),
-      }
-    );
+    const { data: applications = [], refetch } = useQuery({
+      queryKey: ["applicants"],
+      queryFn: fetchApplicants,
+      enabled: activeTab === "applicants",
+      staleTime: 0,
+      select: (data) => data.filter((job) => job.status !== "completed"),
+    });
+    
 
     useEffect(() => {
       if (activeTab === "applicants") {
@@ -746,15 +743,14 @@ const JobRow = ({ job, index, onClick }) => {
       }
     }, [activeTab, refetch]);
 
-    const { data: detailedApplicants = [] } = useQuery(
-      ["applicantDetails", selectedJob],
-      () => fetchApplicantDetails(selectedJob),
-      {
-        enabled: !!selectedJob,
-        staleTime: 0,
-        cacheTime: 0,
-      }
-    );
+    const { data: detailedApplicants = [] } = useQuery({
+      queryKey: ["applicantDetails", selectedJob],
+      queryFn: () => fetchApplicantDetails(selectedJob),
+      enabled: !!selectedJob,
+      staleTime: 0,
+      cacheTime: 0,
+    });
+    
 
     const handleSelectApplicant = async (jobId, applicantId) => {
       try {
@@ -866,23 +862,25 @@ const JobRow = ({ job, index, onClick }) => {
                             </button>
                             {(() => {
                               // Fetch the selected applicant for this job using the GET route
-                              const { data: selectedApplicant, isLoading } =
-                                useQuery(
-                                  ["selectedApplicant", job._id],
-                                  async () => {
-                                    const token = localStorage.getItem("token");
-                                    const { data } = await axios.get(
-                                      `${import.meta.env.VITE_BASE_URL}/jobs/${job._id}/selected-applicant`,
-                                      {
-                                        headers: {
-                                          Authorization: `Bearer ${token}`,
-                                        },
-                                      }
-                                    );
-                                    return data.selectedApplicant;
-                                  },
-                                  { enabled: !!job._id, retry: false }
-                                );
+                              const { data: selectedApplicant, isLoading } = useQuery({
+                                queryKey: ["selectedApplicant", job._id],
+                                queryFn: async () => {
+                                  const token = localStorage.getItem("token");
+                                  const { data } = await axios.get(
+                                    `${import.meta.env.VITE_BASE_URL}/jobs/${job._id}/selected-applicant`,
+                                    {
+                                      headers: {
+                                        Authorization: `Bearer ${token}`,
+                                      },
+                                    }
+                                  );
+                                  return data.selectedApplicant;
+                                },
+                                enabled: !!job._id,
+                                retry: false,
+                              });
+                              
+                                
 
                               const isCurrentSelected =
                                 !isLoading &&
