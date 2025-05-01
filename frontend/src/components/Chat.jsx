@@ -289,7 +289,7 @@ const Chat = () => {
             className={`message ${message.sender._id === user._id ? 'sent' : 'received'}`}
           >
             <img
-              src={`${otherUser.profileImage || 'default.png'}`}
+              src={`${message.sender.profileImage || 'default.png'}`}
               alt={message.sender.name}
               className="message-avatar"
             />
